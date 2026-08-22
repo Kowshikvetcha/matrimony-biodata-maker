@@ -563,6 +563,10 @@
             <input id="gothra">
           </div>
           <div>
+            <label>Maternal Uncle's Gotram</label>
+            <input id="mama_gotram">
+          </div>
+          <div>
             <label>Manglik</label>
             <select id="manglik">
               <option value="">Select</option>
@@ -808,7 +812,7 @@ const FIELDS = [
   "first_name","last_name","gender","dob","height",
   "marital_status","religion","mother_tongue","caste","category","diet","complexion",
   "living_country","living_state","living_city",
-  "gothra","manglik","rashi","nakshatra",
+  "gothra","mama_gotram","manglik","rashi","nakshatra",
   "education","college_name","work_sector","occupation","company_name","annual_income",
   "father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation",
   "current_address","phone","father_phone","mother_phone","email","about_me"
@@ -818,6 +822,7 @@ const LABELS = {
   first_name:"First Name", last_name:"Last Name",
   dob:"Date of Birth",
   marital_status:"Marital Status", caste:"Community", mother_tongue:"Mother Tongue",
+  mama_gotram:"Maternal Uncle's Gotram",
   living_country:"Country", living_state:"State / Province", living_city:"City",
   education:"Highest Qualification", college_name:"College Name", work_sector:"Work Sector",
   occupation:"Job/Occupation", annual_income:"Annual Income", company_name:"Company Name",
@@ -912,7 +917,7 @@ function renderPreview(){
 
   const groups = [
     {title:"Personal", fields:["gender","dob","height","marital_status","religion","mother_tongue","caste","category","diet","complexion","living_country","living_state","living_city"]},
-    {title:"Astro Details", fields:["gothra","manglik","rashi","nakshatra"]},
+    {title:"Astro Details", fields:["gothra","mama_gotram","manglik","rashi","nakshatra"]},
     {title:"Education & Career", fields:["education","college_name","work_sector","occupation","company_name","annual_income"]},
     {title:"Family", fields:["father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation"]},
     {title:"Contact", fields:["current_address","phone","father_phone","mother_phone","email"]}

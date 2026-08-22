@@ -21,6 +21,7 @@ create table public.biodata_submissions (
   living_city text,
   sub_caste text,
   gothra text,
+  mama_gotram text,
   mother_tongue text,
   manglik text,
   rashi text,
@@ -121,7 +122,8 @@ alter table public.biodata_submissions
   add column if not exists mother_phone text,
   add column if not exists category text,
   add column if not exists siblings text,
-  add column if not exists siblings_occupation text;
+  add column if not exists siblings_occupation text,
+  add column if not exists mama_gotram text;
 
 alter table public.biodata_submissions
   drop column if exists full_name;
