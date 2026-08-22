@@ -2,7 +2,8 @@
 create table public.biodata_submissions (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
-  full_name text,
+  first_name text,
+  last_name text,
   gender text,
   dob date,
   time_of_birth text,
@@ -13,6 +14,11 @@ create table public.biodata_submissions (
   marital_status text,
   religion text,
   caste text,
+  category text,
+  diet text,
+  living_country text,
+  living_state text,
+  living_city text,
   sub_caste text,
   gothra text,
   mother_tongue text,
@@ -20,6 +26,8 @@ create table public.biodata_submissions (
   rashi text,
   nakshatra text,
   education text,
+  college_name text,
+  work_sector text,
   occupation text,
   company_name text,
   annual_income text,
@@ -28,9 +36,11 @@ create table public.biodata_submissions (
   mother_name text,
   mother_occupation text,
   siblings text,
-  family_type text,
+  siblings_occupation text,
   current_address text,
   phone text,
+  father_phone text,
+  mother_phone text,
   email text,
   about_me text,
   photo_url text,
@@ -42,6 +52,7 @@ create table public.biodata_submissions (
 -- (Table Editor), which uses your own privileged login, not the anon key.
 alter table public.biodata_submissions enable row level security;
 
+drop policy if exists "Allow public inserts" on public.biodata_submissions;
 create policy "Allow public inserts"
   on public.biodata_submissions
   for insert
@@ -53,12 +64,14 @@ insert into storage.buckets (id, name, public)
 values ('biodata-photos', 'biodata-photos', true)
 on conflict (id) do nothing;
 
+drop policy if exists "Public read of biodata photos" on storage.objects;
 create policy "Public read of biodata photos"
   on storage.objects
   for select
   to public
   using (bucket_id = 'biodata-photos');
 
+drop policy if exists "Anon upload of biodata photos" on storage.objects;
 create policy "Anon upload of biodata photos"
   on storage.objects
   for insert
@@ -71,14 +84,44 @@ insert into storage.buckets (id, name, public)
 values ('biodata-cards', 'biodata-cards', true)
 on conflict (id) do nothing;
 
+drop policy if exists "Public read of biodata cards" on storage.objects;
 create policy "Public read of biodata cards"
   on storage.objects
   for select
   to public
   using (bucket_id = 'biodata-cards');
 
+drop policy if exists "Anon upload of biodata cards" on storage.objects;
 create policy "Anon upload of biodata cards"
   on storage.objects
   for insert
   to anon
   with check (bucket_id = 'biodata-cards');
+
+-- ============================================================
+-- MIGRATION (run this once against the already-live project to
+-- bring an existing biodata_submissions table up to date with the
+-- shaadi.com-style form fields added later). Safe to skip if
+-- you're running this whole file fresh on a brand new project.
+--
+-- Note: `family_type` is left in place if it already exists — it's
+-- just no longer written to by the form. Harmless to leave; drop
+-- it yourself later if you want a fully clean schema.
+-- ============================================================
+alter table public.biodata_submissions
+  add column if not exists first_name text,
+  add column if not exists last_name text,
+  add column if not exists diet text,
+  add column if not exists living_country text,
+  add column if not exists living_state text,
+  add column if not exists living_city text,
+  add column if not exists college_name text,
+  add column if not exists work_sector text,
+  add column if not exists father_phone text,
+  add column if not exists mother_phone text,
+  add column if not exists category text,
+  add column if not exists siblings text,
+  add column if not exists siblings_occupation text;
+
+alter table public.biodata_submissions
+  drop column if exists full_name;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marriage Biodata Maker</title>
+<title>Matrimonial Biodata Maker</title>
 <link rel="icon" type="image/svg+xml" href="logo.svg">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -43,14 +43,6 @@
     padding:clamp(28px,5vw,40px) 20px clamp(32px,6vw,44px);
     text-align:center;
     box-shadow:var(--shadow-lg);
-  }
-  header .eyebrow{
-    display:inline-block;
-    font-size:.72rem;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    opacity:.7;
-    margin-bottom:8px;
   }
   header h1{
     margin:0;
@@ -118,6 +110,34 @@
     gap:12px 14px;
   }
   @media(max-width:520px){ .grid2{grid-template-columns:1fr;} }
+  .phone-row{
+    display:flex;
+    gap:8px;
+  }
+  .phone-row select{width:88px;flex-shrink:0;}
+  .photo-drop{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:26px 16px;
+    border:1.5px dashed #d9d0c0;
+    border-radius:var(--radius-sm);
+    background:#fff;
+    cursor:pointer;
+    text-align:center;
+    color:var(--muted);
+    font-size:.9rem;
+    transition:border-color var(--transition), background var(--transition);
+  }
+  .photo-drop:hover{border-color:var(--maroon);background:#fbeff4;}
+  .photo-drop-icon{font-size:1.6rem;}
+  .photo-note{
+    font-size:.75rem;
+    color:var(--danger);
+    margin-top:6px;
+  }
   label{
     display:block;
     font-size:.8rem;
@@ -375,8 +395,7 @@
 <body>
 
 <header>
-  <span class="eyebrow">Free &amp; Easy</span>
-  <h1><img src="logo.svg" alt="" class="logo">Marriage Biodata Maker</h1>
+  <h1><img src="logo.svg" alt="" class="logo">Matrimonial Biodata Maker</h1>
   <p>Fill in the details, pick a template, and download your biodata as a PDF or image.</p>
 </header>
 
@@ -388,9 +407,15 @@
 
       <fieldset>
         <legend>👤 Personal Details</legend>
-        <label class="req">Full Name</label>
-        <input id="full_name" required>
         <div class="grid2">
+          <div>
+            <label class="req">First Name</label>
+            <input id="first_name" required>
+          </div>
+          <div>
+            <label class="req">Last Name</label>
+            <input id="last_name" required>
+          </div>
           <div>
             <label class="req">Gender</label>
             <select id="gender" required>
@@ -404,60 +429,138 @@
             <input type="date" id="dob" required>
           </div>
           <div>
-            <label>Time of Birth</label>
-            <input type="time" id="time_of_birth">
+            <label class="req">Height</label>
+            <select id="height" required>
+              <option value="">Select</option>
+              <option value="4'0&quot;">4'0" (122 cm)</option>
+              <option value="4'1&quot;">4'1" (124 cm)</option>
+              <option value="4'2&quot;">4'2" (127 cm)</option>
+              <option value="4'3&quot;">4'3" (130 cm)</option>
+              <option value="4'4&quot;">4'4" (132 cm)</option>
+              <option value="4'5&quot;">4'5" (135 cm)</option>
+              <option value="4'6&quot;">4'6" (137 cm)</option>
+              <option value="4'7&quot;">4'7" (140 cm)</option>
+              <option value="4'8&quot;">4'8" (142 cm)</option>
+              <option value="4'9&quot;">4'9" (145 cm)</option>
+              <option value="4'10&quot;">4'10" (147 cm)</option>
+              <option value="4'11&quot;">4'11" (150 cm)</option>
+              <option value="5'0&quot;">5'0" (152 cm)</option>
+              <option value="5'1&quot;">5'1" (155 cm)</option>
+              <option value="5'2&quot;">5'2" (157 cm)</option>
+              <option value="5'3&quot;">5'3" (160 cm)</option>
+              <option value="5'4&quot;">5'4" (163 cm)</option>
+              <option value="5'5&quot;">5'5" (165 cm)</option>
+              <option value="5'6&quot;">5'6" (168 cm)</option>
+              <option value="5'7&quot;">5'7" (170 cm)</option>
+              <option value="5'8&quot;">5'8" (173 cm)</option>
+              <option value="5'9&quot;">5'9" (175 cm)</option>
+              <option value="5'10&quot;">5'10" (178 cm)</option>
+              <option value="5'11&quot;">5'11" (180 cm)</option>
+              <option value="6'0&quot;">6'0" (183 cm)</option>
+            </select>
           </div>
           <div>
-            <label>Place of Birth</label>
-            <input id="place_of_birth">
-          </div>
-          <div>
-            <label>Height</label>
-            <input id="height" placeholder="e.g. 5'6&quot; / 168 cm">
-          </div>
-          <div>
-            <label>Weight</label>
-            <input id="weight" placeholder="e.g. 60 kg">
-          </div>
-          <div>
-            <label>Complexion</label>
-            <input id="complexion">
-          </div>
-          <div>
-            <label>Marital Status</label>
-            <select id="marital_status">
+            <label class="req">Marital Status</label>
+            <select id="marital_status" required>
               <option value="">Select</option>
               <option>Never Married</option>
               <option>Divorced</option>
               <option>Widowed</option>
-              <option>Awaiting Divorce</option>
+              <option>Separated</option>
             </select>
+          </div>
+          <div>
+            <label class="req">Religion</label>
+            <select id="religion" required>
+              <option value="">Select</option>
+              <option>Hindu</option>
+              <option>Muslim</option>
+              <option>Christian</option>
+              <option>Sikh</option>
+              <option>Parsi</option>
+              <option>Jain</option>
+              <option>Buddhist</option>
+              <option>Jewish</option>
+              <option>No Religion</option>
+              <option>Spiritual</option>
+              <option>Spiritual - not religious</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Mother Tongue</label>
+            <input id="mother_tongue" placeholder="e.g., Hindi, Marathi">
+          </div>
+          <div>
+            <label class="req">Community</label>
+            <input id="caste" placeholder="Ex: Reddy, Kapu, Vysya, Brahmin etc." required>
+          </div>
+          <div>
+            <label>Category</label>
+            <select id="category">
+              <option value="">Select</option>
+              <option>OC</option>
+              <option>BC</option>
+              <option>SC</option>
+              <option>ST</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="req">Diet</label>
+            <select id="diet" required>
+              <option value="">Select</option>
+              <option>Veg</option>
+              <option>Non-Veg</option>
+              <option>Eggetarian</option>
+              <option>Vegan</option>
+            </select>
+          </div>
+          <div>
+            <label>Complexion</label>
+            <select id="complexion">
+              <option value="">Select</option>
+              <option>Very Fair</option>
+              <option>Fair</option>
+              <option>Wheatish</option>
+              <option>Wheatish Brown</option>
+              <option>Dark</option>
+            </select>
+          </div>
+          <div>
+            <label class="req">Living In</label>
+            <select id="living_country" required>
+              <option value="">Select</option>
+              <option>India</option>
+              <option>USA</option>
+              <option>UK</option>
+              <option>Canada</option>
+              <option>Australia</option>
+              <option>UAE</option>
+              <option>Singapore</option>
+              <option>Saudi Arabia</option>
+              <option>Germany</option>
+              <option>New Zealand</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="req">State / Province</label>
+            <input id="living_state" required>
+          </div>
+          <div>
+            <label class="req">City</label>
+            <input id="living_city" required>
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>✨ Religion &amp; Astro Details</legend>
+        <legend>✨ Astro Details</legend>
         <div class="grid2">
-          <div>
-            <label>Religion</label>
-            <input id="religion">
-          </div>
-          <div>
-            <label>Caste</label>
-            <input id="caste">
-          </div>
-          <div>
-            <label>Sub-caste</label>
-            <input id="sub_caste">
-          </div>
           <div>
             <label>Gothra</label>
             <input id="gothra">
-          </div>
-          <div>
-            <label>Mother Tongue</label>
-            <input id="mother_tongue">
           </div>
           <div>
             <label>Manglik</label>
@@ -483,20 +586,55 @@
         <legend>🎓 Education &amp; Career</legend>
         <div class="grid2">
           <div>
-            <label>Highest Education</label>
-            <input id="education">
+            <label class="req">Highest Qualification</label>
+            <select id="education" required>
+              <option value="">Select</option>
+              <option>High School</option>
+              <option>Diploma</option>
+              <option>Bachelor's Degree</option>
+              <option>Master's Degree</option>
+              <option>Doctorate (PhD)</option>
+              <option>Professional Degree</option>
+              <option>Other</option>
+            </select>
           </div>
           <div>
-            <label>Occupation</label>
-            <input id="occupation">
+            <label class="req">College Name</label>
+            <input id="college_name" placeholder="College / University" required>
           </div>
           <div>
-            <label>Company / Organization</label>
-            <input id="company_name">
+            <label class="req">Work Sector</label>
+            <select id="work_sector" required>
+              <option value="">Select</option>
+              <option>Government / PSU</option>
+              <option>Private Sector</option>
+              <option>Business / Self-Employed</option>
+              <option>Defence</option>
+              <option>Not Working</option>
+              <option>Other</option>
+            </select>
           </div>
           <div>
-            <label>Annual Income</label>
-            <input id="annual_income">
+            <label class="req">Job/Occupation</label>
+            <input id="occupation" placeholder="e.g., Software Engineer" required>
+          </div>
+          <div>
+            <label class="req">Company Name</label>
+            <input id="company_name" placeholder="Company / Employer" required>
+          </div>
+          <div>
+            <label class="req">Annual Income</label>
+            <select id="annual_income" required>
+              <option value="">Select</option>
+              <option>Below ₹2 Lakhs</option>
+              <option>₹2 - 5 Lakhs</option>
+              <option>₹5 - 10 Lakhs</option>
+              <option>₹10 - 15 Lakhs</option>
+              <option>₹15 - 25 Lakhs</option>
+              <option>₹25 - 50 Lakhs</option>
+              <option>₹50 Lakhs+</option>
+              <option>Prefer not to say</option>
+            </select>
           </div>
         </div>
       </fieldset>
@@ -506,57 +644,110 @@
         <div class="grid2">
           <div>
             <label>Father's Name</label>
-            <input id="father_name">
+            <input id="father_name" placeholder="Father's name">
           </div>
           <div>
             <label>Father's Occupation</label>
-            <input id="father_occupation">
+            <input id="father_occupation" placeholder="Occupation">
           </div>
           <div>
             <label>Mother's Name</label>
-            <input id="mother_name">
+            <input id="mother_name" placeholder="Mother's name">
           </div>
           <div>
             <label>Mother's Occupation</label>
-            <input id="mother_occupation">
+            <input id="mother_occupation" placeholder="Occupation">
           </div>
           <div>
             <label>Siblings</label>
             <input id="siblings" placeholder="e.g. 1 elder sister (married)">
           </div>
           <div>
-            <label>Family Type</label>
-            <select id="family_type">
-              <option value="">Select</option>
-              <option>Nuclear</option>
-              <option>Joint</option>
-            </select>
+            <label>Siblings' Occupation</label>
+            <input id="siblings_occupation" placeholder="e.g. Teacher, Engineer">
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>📞 Contact Details</legend>
-        <label>Current Address</label>
-        <textarea id="current_address"></textarea>
+        <legend>📞 Contact Information</legend>
         <div class="grid2">
           <div>
-            <label>Phone Number *</label>
-            <input id="phone" type="tel" required>
+            <label class="req">Contact No</label>
+            <div class="phone-row">
+              <select id="phone_code">
+                  <option value="+91">+91</option>
+                  <option value="+1">+1</option>
+                  <option value="+44">+44</option>
+                  <option value="+61">+61</option>
+                  <option value="+971">+971</option>
+                  <option value="+65">+65</option>
+                  <option value="+966">+966</option>
+                  <option value="+49">+49</option>
+                  <option value="+64">+64</option>
+                  <option value="Other">Other</option>
+              </select>
+              <input id="phone_number" type="tel" placeholder="10-digit mobile number" required>
+            </div>
+            <input type="hidden" id="phone">
           </div>
           <div>
-            <label>Email</label>
-            <input id="email" type="email">
+            <label class="req">Email ID</label>
+            <input id="email" type="email" placeholder="your@email.com" required>
+          </div>
+          <div>
+            <label>Father's Contact No.</label>
+            <div class="phone-row">
+              <select id="father_phone_code">
+                  <option value="+91">+91</option>
+                  <option value="+1">+1</option>
+                  <option value="+44">+44</option>
+                  <option value="+61">+61</option>
+                  <option value="+971">+971</option>
+                  <option value="+65">+65</option>
+                  <option value="+966">+966</option>
+                  <option value="+49">+49</option>
+                  <option value="+64">+64</option>
+                  <option value="Other">Other</option>
+              </select>
+              <input id="father_phone_number" type="tel" placeholder="10-digit mobile">
+            </div>
+            <input type="hidden" id="father_phone">
+          </div>
+          <div>
+            <label>Mother's Contact No.</label>
+            <div class="phone-row">
+              <select id="mother_phone_code">
+                  <option value="+91">+91</option>
+                  <option value="+1">+1</option>
+                  <option value="+44">+44</option>
+                  <option value="+61">+61</option>
+                  <option value="+971">+971</option>
+                  <option value="+65">+65</option>
+                  <option value="+966">+966</option>
+                  <option value="+49">+49</option>
+                  <option value="+64">+64</option>
+                  <option value="Other">Other</option>
+              </select>
+              <input id="mother_phone_number" type="tel" placeholder="10-digit mobile">
+            </div>
+            <input type="hidden" id="mother_phone">
           </div>
         </div>
+        <label>Address</label>
+        <textarea id="current_address" placeholder="Full residential address"></textarea>
       </fieldset>
 
       <fieldset>
-        <legend>📸 Photo &amp; About Me</legend>
-        <label>Photo (optional)</label>
-        <input type="file" id="photo" accept="image/*">
+        <legend>📸 Photo Upload</legend>
+        <label class="photo-drop" id="photoDrop">
+          <input type="file" id="photo" accept="image/jpeg,image/png" hidden>
+          <span class="photo-drop-icon">📷</span>
+          <span id="photoDropLabel">Click to upload photo</span>
+        </label>
+        <div class="photo-note">* Only JPG, JPEG and PNG formats are accepted.</div>
         <label>About Me</label>
-        <textarea id="about_me" placeholder="A few lines about yourself, hobbies, values..."></textarea>
+        <textarea id="about_me" placeholder="A few lines about yourself, hobbies, values, your conditions, requirements..."></textarea>
       </fieldset>
 
       <div class="actions">
@@ -580,7 +771,7 @@
     </div>
     <div id="card" class="tpl-classic">
       <div class="card-header">
-        <h2>Marriage Biodata</h2>
+        <h2>Matrimonial Biodata</h2>
         <div class="subtitle" id="cardSubtitle">Om Shri Ganeshaya Namah</div>
       </div>
 
@@ -614,20 +805,26 @@ if (SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !=
 }
 
 const FIELDS = [
-  "full_name","gender","dob","time_of_birth","place_of_birth","height","weight",
-  "complexion","marital_status","religion","caste","sub_caste","gothra","mother_tongue",
-  "manglik","rashi","nakshatra","education","occupation","company_name","annual_income",
-  "father_name","father_occupation","mother_name","mother_occupation","siblings","family_type",
-  "current_address","phone","email","about_me"
+  "first_name","last_name","gender","dob","height",
+  "marital_status","religion","mother_tongue","caste","category","diet","complexion",
+  "living_country","living_state","living_city",
+  "gothra","manglik","rashi","nakshatra",
+  "education","college_name","work_sector","occupation","company_name","annual_income",
+  "father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation",
+  "current_address","phone","father_phone","mother_phone","email","about_me"
 ];
 
 const LABELS = {
-  dob:"Date of Birth", time_of_birth:"Time of Birth", place_of_birth:"Place of Birth",
-  marital_status:"Marital Status", sub_caste:"Sub-caste", mother_tongue:"Mother Tongue",
+  first_name:"First Name", last_name:"Last Name",
+  dob:"Date of Birth",
+  marital_status:"Marital Status", caste:"Community", mother_tongue:"Mother Tongue",
+  living_country:"Country", living_state:"State / Province", living_city:"City",
+  education:"Highest Qualification", college_name:"College Name", work_sector:"Work Sector",
+  occupation:"Job/Occupation", annual_income:"Annual Income", company_name:"Company Name",
   father_name:"Father's Name", father_occupation:"Father's Occupation",
-  mother_name:"Mother's Name", mother_occupation:"Mother's Occupation",
-  family_type:"Family Type", current_address:"Address", annual_income:"Annual Income",
-  company_name:"Company"
+  mother_name:"Mother's Name", mother_occupation:"Mother's Occupation", siblings_occupation:"Siblings' Occupation",
+  current_address:"Address", phone:"Contact No", father_phone:"Father's Contact No.",
+  mother_phone:"Mother's Contact No.", email:"Email ID"
 };
 
 function label(f){
@@ -638,7 +835,7 @@ const TEMPLATE_SUBTITLES = {
   classic: "Om Shri Ganeshaya Namah",
   modern: "",
   elegant: "A New Beginning",
-  royal: "Two Families, One Bond"
+  royal: ""
 };
 
 function setTemplate(name){
@@ -668,9 +865,20 @@ function fmtDate(v){
 
 let photoDataUrl = "";
 
+const ALLOWED_PHOTO_TYPES = ["image/jpeg","image/png"];
+
 document.getElementById("photo").addEventListener("change", e => {
   const file = e.target.files[0];
   if(!file) return;
+
+  if(!ALLOWED_PHOTO_TYPES.includes(file.type)){
+    showStatus("err", "Only JPG, JPEG and PNG photos are accepted.");
+    e.target.value = "";
+    return;
+  }
+
+  document.getElementById("photoDropLabel").textContent = file.name;
+
   const reader = new FileReader();
   reader.onload = ev => {
     photoDataUrl = ev.target.result;
@@ -679,17 +887,35 @@ document.getElementById("photo").addEventListener("change", e => {
   reader.readAsDataURL(file);
 });
 
+// Each phone number is a country-code dropdown + a number field, combined
+// into one hidden field so the rest of the app (record building, preview,
+// PDF/image rendering) can keep treating it as a single value.
+function wirePhoneField(codeId, numberId, hiddenId){
+  const sync = () => {
+    const code = document.getElementById(codeId).value;
+    const number = document.getElementById(numberId).value.trim();
+    document.getElementById(hiddenId).value = number ? `${code} ${number}` : "";
+    renderPreview();
+  };
+  document.getElementById(codeId).addEventListener("change", sync);
+  document.getElementById(numberId).addEventListener("input", sync);
+}
+wirePhoneField("phone_code", "phone_number", "phone");
+wirePhoneField("father_phone_code", "father_phone_number", "father_phone");
+wirePhoneField("mother_phone_code", "mother_phone_number", "mother_phone");
+
 function renderPreview(){
-  const name = document.getElementById("full_name").value.trim();
+  const name = [document.getElementById("first_name").value.trim(), document.getElementById("last_name").value.trim()]
+    .filter(Boolean).join(" ");
   document.getElementById("nameLine").textContent = name || "Your Name";
   document.getElementById("aboutLine").textContent = document.getElementById("about_me").value.trim();
 
   const groups = [
-    {title:"Personal", fields:["gender","dob","time_of_birth","place_of_birth","height","weight","complexion","marital_status"]},
-    {title:"Religion & Astro", fields:["religion","caste","sub_caste","gothra","mother_tongue","manglik","rashi","nakshatra"]},
-    {title:"Education & Career", fields:["education","occupation","company_name","annual_income"]},
-    {title:"Family", fields:["father_name","father_occupation","mother_name","mother_occupation","siblings","family_type"]},
-    {title:"Contact", fields:["current_address","phone","email"]}
+    {title:"Personal", fields:["gender","dob","height","marital_status","religion","mother_tongue","caste","category","diet","complexion","living_country","living_state","living_city"]},
+    {title:"Astro Details", fields:["gothra","manglik","rashi","nakshatra"]},
+    {title:"Education & Career", fields:["education","college_name","work_sector","occupation","company_name","annual_income"]},
+    {title:"Family", fields:["father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation"]},
+    {title:"Contact", fields:["current_address","phone","father_phone","mother_phone","email"]}
   ];
 
   let html = "";
@@ -772,7 +998,8 @@ async function uploadCardImage(canvas){
 }
 
 function fileNameBase(){
-  const name = document.getElementById("full_name").value.trim() || "biodata";
+  const name = [document.getElementById("first_name").value.trim(), document.getElementById("last_name").value.trim()]
+    .filter(Boolean).join(" ") || "biodata";
   return name.replace(/\s+/g,"_");
 }
 
@@ -840,11 +1067,10 @@ async function saveToDbIfNeeded(cardCanvas){
 }
 
 function validate(){
-  if(!document.getElementById("full_name").value.trim() ||
-     !document.getElementById("gender").value ||
-     !document.getElementById("dob").value ||
-     !document.getElementById("phone").value.trim()){
-    showStatus("err", "Please fill in Full Name, Gender, Date of Birth and Phone Number.");
+  const form = document.getElementById("bioForm");
+  if(!form.checkValidity()){
+    form.reportValidity();
+    showStatus("err", "Please fill in all required fields (marked with *).");
     return false;
   }
   return true;
