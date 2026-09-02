@@ -60,17 +60,17 @@ create policy "Allow public inserts"
   to anon
   with check (true);
 
--- Storage bucket for optional profile photos
+-- Storage bucket for optional profile photos.
+-- No SELECT policy: the bucket is public, so GET on a known file's
+-- public URL (.../object/public/biodata-photos/<file>) already works
+-- without RLS. Adding a broad SELECT policy would instead let anyone
+-- LIST every file in the bucket via the Storage API, which is the
+-- "Clients can list all files in this bucket" warning Supabase flags.
 insert into storage.buckets (id, name, public)
 values ('biodata-photos', 'biodata-photos', true)
 on conflict (id) do nothing;
 
 drop policy if exists "Public read of biodata photos" on storage.objects;
-create policy "Public read of biodata photos"
-  on storage.objects
-  for select
-  to public
-  using (bucket_id = 'biodata-photos');
 
 drop policy if exists "Anon upload of biodata photos" on storage.objects;
 create policy "Anon upload of biodata photos"
@@ -80,17 +80,13 @@ create policy "Anon upload of biodata photos"
   with check (bucket_id = 'biodata-photos');
 
 -- Storage bucket for the generated biodata card image (the rendered
--- template, same image the user downloads as PDF/PNG)
+-- template, same image the user downloads as PDF/PNG). Same reasoning
+-- as above: no SELECT policy needed or wanted.
 insert into storage.buckets (id, name, public)
 values ('biodata-cards', 'biodata-cards', true)
 on conflict (id) do nothing;
 
 drop policy if exists "Public read of biodata cards" on storage.objects;
-create policy "Public read of biodata cards"
-  on storage.objects
-  for select
-  to public
-  using (bucket_id = 'biodata-cards');
 
 drop policy if exists "Anon upload of biodata cards" on storage.objects;
 create policy "Anon upload of biodata cards"
