@@ -336,8 +336,10 @@
   .kv .v{font-weight:600;color:var(--ink);word-break:break-word;}
   .empty-hint{color:var(--muted);font-size:.8rem;text-align:center;padding:20px 0;}
 
-  /* Modern Minimal */
-  #card.tpl-modern{
+  /* Modern Minimal — shared by #card and #igCard. Selectors list both ids
+     explicitly (rather than a bare .tpl-modern class) so specificity still
+     beats each element's own id-level default block below. */
+  #card.tpl-modern, #igCard.tpl-modern{
     --c-bg:#ffffff;
     --c-border:#eceff2;
     --c-border-width:1px;
@@ -356,7 +358,7 @@
   }
 
   /* Elegant Rose */
-  #card.tpl-elegant{
+  #card.tpl-elegant, #igCard.tpl-elegant{
     --c-bg:#fff6f8;
     --c-border:#e7b6c4;
     --c-border-width:1px;
@@ -371,7 +373,7 @@
   }
 
   /* Royal Navy & Gold */
-  #card.tpl-royal{
+  #card.tpl-royal, #igCard.tpl-royal{
     --c-bg:#ffffff;
     --c-border:#c9a24b;
     --c-border-width:2px;
@@ -403,6 +405,16 @@
   }
   .ig-note input{width:auto;margin-top:2px;}
   #igCard{
+    /* Classic defaults — same variables the main #card templates set,
+       so applying a .tpl-modern/.tpl-elegant/.tpl-royal class here
+       (kept in sync with the template picker) re-colors this card too. */
+    --c-bg:#fffdf8;
+    --c-border:var(--gold);
+    --c-heading:var(--maroon);
+    --c-name:var(--maroon-dark);
+    --c-accent:var(--maroon);
+    --c-divider:var(--border);
+
     position:absolute;
     left:-9999px;
     top:0;
@@ -414,9 +426,9 @@
     flex-direction:column;
     align-items:center;
     text-align:center;
-    background:linear-gradient(160deg,#fff8f0 0%, #fbeef2 100%);
-    border:14px solid var(--gold);
-    outline:2px solid var(--maroon);
+    background:var(--c-bg);
+    border:14px solid var(--c-border);
+    outline:2px solid var(--c-accent);
     outline-offset:-24px;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink);
@@ -425,13 +437,13 @@
     font-size:28px;
     letter-spacing:4px;
     text-transform:uppercase;
-    color:var(--maroon);
+    color:var(--c-accent);
     font-weight:700;
     margin-bottom:30px;
   }
   #igPhotoBox{
     width:340px;height:340px;border-radius:50%;
-    border:8px solid var(--gold);
+    border:8px solid var(--c-border);
     box-shadow:0 10px 30px rgba(0,0,0,.15);
     overflow:hidden;
     background:#f4ede1;
@@ -441,16 +453,16 @@
     flex-shrink:0;
   }
   #igPhotoBox img{width:100%;height:100%;object-fit:cover;}
-  #igName{font-size:52px;font-weight:800;color:var(--maroon-dark);margin-bottom:10px;line-height:1.2;}
+  #igName{font-size:52px;font-weight:800;color:var(--c-name);margin-bottom:10px;line-height:1.2;}
   #igTagline{font-size:27px;color:#555;margin-bottom:28px;}
-  .ig-divider{width:120px;height:3px;background:var(--gold);margin:0 0 32px;flex-shrink:0;}
+  .ig-divider{width:120px;height:3px;background:var(--c-border);margin:0 0 32px;flex-shrink:0;}
   #igDetails{font-size:25px;line-height:2.15;color:var(--ink);}
   #igFooter{
     margin-top:auto;
     padding-top:26px;
-    border-top:2px solid var(--border);
+    border-top:2px solid var(--c-divider);
     font-size:26px;
-    color:var(--maroon-dark);
+    color:var(--c-name);
     font-weight:700;
     width:100%;
   }
@@ -929,6 +941,7 @@ const TEMPLATE_SUBTITLES = {
 function setTemplate(name){
   if(!TEMPLATE_SUBTITLES.hasOwnProperty(name)) name = "classic";
   document.getElementById("card").className = "tpl-" + name;
+  document.getElementById("igCard").className = "tpl-" + name;
   document.getElementById("cardSubtitle").textContent = TEMPLATE_SUBTITLES[name];
   document.querySelectorAll(".tp-swatch").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.template === name);
