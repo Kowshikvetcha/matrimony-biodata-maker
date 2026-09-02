@@ -38,11 +38,38 @@
     -webkit-font-smoothing:antialiased;
   }
   header{
+    position:relative;
     background:linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
     color:#fff;
     padding:clamp(28px,5vw,40px) 20px clamp(32px,6vw,44px);
     text-align:center;
     box-shadow:var(--shadow-lg);
+  }
+  .lang-picker{
+    position:absolute;
+    top:14px;
+    right:16px;
+    display:flex;
+    gap:4px;
+  }
+  .lang-picker button{
+    padding:6px 12px;
+    font-size:.78rem;
+    font-weight:700;
+    border-radius:20px;
+    border:1.5px solid rgba(255,255,255,.5);
+    background:transparent;
+    color:#fff;
+    opacity:.8;
+  }
+  .lang-picker button.active{
+    background:#fff;
+    color:var(--maroon-dark);
+    border-color:#fff;
+    opacity:1;
+  }
+  @media(max-width:520px){
+    .lang-picker{position:static; justify-content:center; margin-bottom:10px;}
   }
   header h1{
     margin:0;
@@ -472,8 +499,12 @@
 <body>
 
 <header>
-  <h1><img src="logo.svg" alt="" class="logo">Matrimonial Biodata Maker</h1>
-  <p>Fill in the details, pick a template, and download your biodata as a PDF or image.</p>
+  <div class="lang-picker" id="langPicker">
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="te">తె</button>
+  </div>
+  <h1><img src="logo.svg" alt="" class="logo"><span data-i18n="appTitle">Matrimonial Biodata Maker</span></h1>
+  <p data-i18n="appSubtitle">Fill in the details, pick a template, and download your biodata as a PDF or image.</p>
 </header>
 
 <div class="layout">
@@ -483,32 +514,32 @@
     <form id="bioForm">
 
       <fieldset>
-        <legend>👤 Personal Details</legend>
+        <legend data-i18n="legendPersonal">👤 Personal Details</legend>
         <div class="grid2">
           <div>
-            <label class="req">First Name</label>
+            <label class="req" data-i18n="formLabel.first_name">First Name</label>
             <input id="first_name" required>
           </div>
           <div>
-            <label class="req">Last Name</label>
+            <label class="req" data-i18n="formLabel.last_name">Last Name</label>
             <input id="last_name" required>
           </div>
           <div>
-            <label class="req">Gender</label>
-            <select id="gender" required>
-              <option value="">Select</option>
-              <option>Male</option>
-              <option>Female</option>
+            <label class="req" data-i18n="formLabel.gender">Gender</label>
+            <select id="gender" required data-i18n-options="gender">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
             </select>
           </div>
           <div>
-            <label class="req">Date of Birth</label>
+            <label class="req" data-i18n="formLabel.dob">Date of Birth</label>
             <input type="date" id="dob" required>
           </div>
           <div>
-            <label class="req">Height</label>
+            <label class="req" data-i18n="formLabel.height">Height</label>
             <select id="height" required>
-              <option value="">Select</option>
+              <option value="" data-i18n="selectPlaceholder">Select</option>
               <option value="4'0&quot;">4'0" (122 cm)</option>
               <option value="4'1&quot;">4'1" (124 cm)</option>
               <option value="4'2&quot;">4'2" (127 cm)</option>
@@ -537,224 +568,224 @@
             </select>
           </div>
           <div>
-            <label class="req">Marital Status</label>
-            <select id="marital_status" required>
-              <option value="">Select</option>
-              <option>Never Married</option>
-              <option>Divorced</option>
-              <option>Widowed</option>
-              <option>Separated</option>
+            <label class="req" data-i18n="formLabel.marital_status">Marital Status</label>
+            <select id="marital_status" required data-i18n-options="marital_status">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Never Married">Never Married</option>
+              <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
+              <option value="Separated">Separated</option>
             </select>
           </div>
           <div>
-            <label class="req">Religion</label>
-            <select id="religion" required>
-              <option value="">Select</option>
-              <option>Hindu</option>
-              <option>Muslim</option>
-              <option>Christian</option>
-              <option>Sikh</option>
-              <option>Parsi</option>
-              <option>Jain</option>
-              <option>Buddhist</option>
-              <option>Jewish</option>
-              <option>No Religion</option>
-              <option>Spiritual</option>
-              <option>Spiritual - not religious</option>
-              <option>Other</option>
+            <label class="req" data-i18n="formLabel.religion">Religion</label>
+            <select id="religion" required data-i18n-options="religion">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Hindu">Hindu</option>
+              <option value="Muslim">Muslim</option>
+              <option value="Christian">Christian</option>
+              <option value="Sikh">Sikh</option>
+              <option value="Parsi">Parsi</option>
+              <option value="Jain">Jain</option>
+              <option value="Buddhist">Buddhist</option>
+              <option value="Jewish">Jewish</option>
+              <option value="No Religion">No Religion</option>
+              <option value="Spiritual">Spiritual</option>
+              <option value="Spiritual - not religious">Spiritual - not religious</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div>
-            <label>Mother Tongue</label>
-            <input id="mother_tongue" placeholder="e.g., Hindi, Marathi">
+            <label data-i18n="formLabel.mother_tongue">Mother Tongue</label>
+            <input id="mother_tongue" placeholder="e.g., Hindi, Marathi" data-i18n-ph="ph.mother_tongue">
           </div>
           <div>
-            <label class="req">Community</label>
-            <input id="caste" placeholder="Ex: Reddy, Kapu, Vysya, Brahmin etc." required>
+            <label class="req" data-i18n="formLabel.caste">Community</label>
+            <input id="caste" placeholder="Ex: Reddy, Kapu, Vysya, Brahmin etc." required data-i18n-ph="ph.caste">
           </div>
           <div>
-            <label>Category</label>
-            <select id="category">
-              <option value="">Select</option>
-              <option>OC</option>
-              <option>BC</option>
-              <option>SC</option>
-              <option>ST</option>
-              <option>Other</option>
+            <label data-i18n="formLabel.category">Category</label>
+            <select id="category" data-i18n-options="category">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="OC">OC</option>
+              <option value="BC">BC</option>
+              <option value="SC">SC</option>
+              <option value="ST">ST</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div>
-            <label class="req">Diet</label>
-            <select id="diet" required>
-              <option value="">Select</option>
-              <option>Veg</option>
-              <option>Non-Veg</option>
-              <option>Eggetarian</option>
-              <option>Vegan</option>
+            <label class="req" data-i18n="formLabel.diet">Diet</label>
+            <select id="diet" required data-i18n-options="diet">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Veg">Veg</option>
+              <option value="Non-Veg">Non-Veg</option>
+              <option value="Eggetarian">Eggetarian</option>
+              <option value="Vegan">Vegan</option>
             </select>
           </div>
           <div>
-            <label>Complexion</label>
-            <select id="complexion">
-              <option value="">Select</option>
-              <option>Very Fair</option>
-              <option>Fair</option>
-              <option>Wheatish</option>
-              <option>Wheatish Brown</option>
-              <option>Dark</option>
+            <label data-i18n="formLabel.complexion">Complexion</label>
+            <select id="complexion" data-i18n-options="complexion">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Very Fair">Very Fair</option>
+              <option value="Fair">Fair</option>
+              <option value="Wheatish">Wheatish</option>
+              <option value="Wheatish Brown">Wheatish Brown</option>
+              <option value="Dark">Dark</option>
             </select>
           </div>
           <div>
-            <label class="req">Living In</label>
-            <select id="living_country" required>
-              <option value="">Select</option>
-              <option>India</option>
-              <option>USA</option>
-              <option>UK</option>
-              <option>Canada</option>
-              <option>Australia</option>
-              <option>UAE</option>
-              <option>Singapore</option>
-              <option>Saudi Arabia</option>
-              <option>Germany</option>
-              <option>New Zealand</option>
-              <option>Other</option>
+            <label class="req" data-i18n="formLabel.living_country">Living In</label>
+            <select id="living_country" required data-i18n-options="living_country">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="India">India</option>
+              <option value="USA">USA</option>
+              <option value="UK">UK</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="UAE">UAE</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Germany">Germany</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div>
-            <label class="req">State / Province</label>
+            <label class="req" data-i18n="formLabel.living_state">State / Province</label>
             <input id="living_state" required>
           </div>
           <div>
-            <label class="req">City</label>
+            <label class="req" data-i18n="formLabel.living_city">City</label>
             <input id="living_city" required>
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>✨ Astro Details</legend>
+        <legend data-i18n="legendAstro">✨ Astro Details</legend>
         <div class="grid2">
           <div>
-            <label>Gothra</label>
+            <label data-i18n="formLabel.gothra">Gothra</label>
             <input id="gothra">
           </div>
           <div>
-            <label>Maternal Uncle's Gotram</label>
+            <label data-i18n="formLabel.mama_gotram">Maternal Uncle's Gotram</label>
             <input id="mama_gotram">
           </div>
           <div>
-            <label>Manglik</label>
-            <select id="manglik">
-              <option value="">Select</option>
-              <option>Yes</option>
-              <option>No</option>
-              <option>Don't know</option>
+            <label data-i18n="formLabel.manglik">Manglik</label>
+            <select id="manglik" data-i18n-options="manglik">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+              <option value="Don't know">Don't know</option>
             </select>
           </div>
           <div>
-            <label>Rashi (Moon Sign)</label>
+            <label data-i18n="formLabel.rashi">Rashi (Moon Sign)</label>
             <input id="rashi">
           </div>
           <div>
-            <label>Nakshatra</label>
+            <label data-i18n="formLabel.nakshatra">Nakshatra</label>
             <input id="nakshatra">
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>🎓 Education &amp; Career</legend>
+        <legend data-i18n="legendEducation">🎓 Education &amp; Career</legend>
         <div class="grid2">
           <div>
-            <label class="req">Highest Qualification</label>
-            <select id="education" required>
-              <option value="">Select</option>
-              <option>High School</option>
-              <option>Diploma</option>
-              <option>Bachelor's Degree</option>
-              <option>Master's Degree</option>
-              <option>Doctorate (PhD)</option>
-              <option>Professional Degree</option>
-              <option>Other</option>
+            <label class="req" data-i18n="formLabel.education">Highest Qualification</label>
+            <select id="education" required data-i18n-options="education">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="High School">High School</option>
+              <option value="Diploma">Diploma</option>
+              <option value="Bachelor's Degree">Bachelor's Degree</option>
+              <option value="Master's Degree">Master's Degree</option>
+              <option value="Doctorate (PhD)">Doctorate (PhD)</option>
+              <option value="Professional Degree">Professional Degree</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div>
-            <label class="req">College Name</label>
-            <input id="college_name" placeholder="College / University" required>
+            <label class="req" data-i18n="formLabel.college_name">College Name</label>
+            <input id="college_name" placeholder="College / University" required data-i18n-ph="ph.college_name">
           </div>
           <div>
-            <label class="req">Work Sector</label>
-            <select id="work_sector" required>
-              <option value="">Select</option>
-              <option>Government / PSU</option>
-              <option>Private Sector</option>
-              <option>Business / Self-Employed</option>
-              <option>Defence</option>
-              <option>Not Working</option>
-              <option>Other</option>
+            <label class="req" data-i18n="formLabel.work_sector">Work Sector</label>
+            <select id="work_sector" required data-i18n-options="work_sector">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Government / PSU">Government / PSU</option>
+              <option value="Private Sector">Private Sector</option>
+              <option value="Business / Self-Employed">Business / Self-Employed</option>
+              <option value="Defence">Defence</option>
+              <option value="Not Working">Not Working</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div>
-            <label class="req">Job/Occupation</label>
-            <input id="occupation" placeholder="e.g., Software Engineer" required>
+            <label class="req" data-i18n="formLabel.occupation">Job/Occupation</label>
+            <input id="occupation" placeholder="e.g., Software Engineer" required data-i18n-ph="ph.occupation">
           </div>
           <div>
-            <label class="req">Company Name</label>
-            <input id="company_name" placeholder="Company / Employer" required>
+            <label class="req" data-i18n="formLabel.company_name">Company Name</label>
+            <input id="company_name" placeholder="Company / Employer" required data-i18n-ph="ph.company_name">
           </div>
           <div>
-            <label class="req">Annual Income</label>
-            <select id="annual_income" required>
-              <option value="">Select</option>
-              <option>Below ₹2 Lakhs</option>
-              <option>₹2 - 5 Lakhs</option>
-              <option>₹5 - 10 Lakhs</option>
-              <option>₹10 - 15 Lakhs</option>
-              <option>₹15 - 25 Lakhs</option>
-              <option>₹25 - 50 Lakhs</option>
-              <option>₹50 Lakhs+</option>
-              <option>Prefer not to say</option>
+            <label class="req" data-i18n="formLabel.annual_income">Annual Income</label>
+            <select id="annual_income" required data-i18n-options="annual_income">
+              <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="Below ₹2 Lakhs">Below ₹2 Lakhs</option>
+              <option value="₹2 - 5 Lakhs">₹2 - 5 Lakhs</option>
+              <option value="₹5 - 10 Lakhs">₹5 - 10 Lakhs</option>
+              <option value="₹10 - 15 Lakhs">₹10 - 15 Lakhs</option>
+              <option value="₹15 - 25 Lakhs">₹15 - 25 Lakhs</option>
+              <option value="₹25 - 50 Lakhs">₹25 - 50 Lakhs</option>
+              <option value="₹50 Lakhs+">₹50 Lakhs+</option>
+              <option value="Prefer not to say">Prefer not to say</option>
             </select>
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>👪 Family Details</legend>
+        <legend data-i18n="legendFamily">👪 Family Details</legend>
         <div class="grid2">
           <div>
-            <label>Father's Name</label>
-            <input id="father_name" placeholder="Father's name">
+            <label data-i18n="formLabel.father_name">Father's Name</label>
+            <input id="father_name" placeholder="Father's name" data-i18n-ph="ph.father_name">
           </div>
           <div>
-            <label>Father's Occupation</label>
-            <input id="father_occupation" placeholder="Occupation">
+            <label data-i18n="formLabel.father_occupation">Father's Occupation</label>
+            <input id="father_occupation" placeholder="Occupation" data-i18n-ph="ph.occupation_generic">
           </div>
           <div>
-            <label>Mother's Name</label>
-            <input id="mother_name" placeholder="Mother's name">
+            <label data-i18n="formLabel.mother_name">Mother's Name</label>
+            <input id="mother_name" placeholder="Mother's name" data-i18n-ph="ph.mother_name">
           </div>
           <div>
-            <label>Mother's Occupation</label>
-            <input id="mother_occupation" placeholder="Occupation">
+            <label data-i18n="formLabel.mother_occupation">Mother's Occupation</label>
+            <input id="mother_occupation" placeholder="Occupation" data-i18n-ph="ph.occupation_generic">
           </div>
           <div>
-            <label>Siblings</label>
-            <input id="siblings" placeholder="e.g. 1 elder sister (married)">
+            <label data-i18n="formLabel.siblings">Siblings</label>
+            <input id="siblings" placeholder="e.g. 1 elder sister (married)" data-i18n-ph="ph.siblings">
           </div>
           <div>
-            <label>Siblings' Occupation</label>
-            <input id="siblings_occupation" placeholder="e.g. Teacher, Engineer">
+            <label data-i18n="formLabel.siblings_occupation">Siblings' Occupation</label>
+            <input id="siblings_occupation" placeholder="e.g. Teacher, Engineer" data-i18n-ph="ph.siblings_occupation">
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>📞 Contact Information</legend>
+        <legend data-i18n="legendContact">📞 Contact Information</legend>
         <div class="grid2">
           <div>
-            <label class="req">Contact No</label>
+            <label class="req" data-i18n="formLabel.contact_no">Contact No</label>
             <div class="phone-row">
               <select id="phone_code">
                   <option value="+91">+91</option>
@@ -768,20 +799,20 @@
                   <option value="+64">+64</option>
                   <option value="Other">Other</option>
               </select>
-              <input id="phone_number" type="tel" placeholder="10-digit mobile number" required>
+              <input id="phone_number" type="tel" placeholder="10-digit mobile number" required data-i18n-ph="ph.phone_number">
             </div>
             <input type="hidden" id="phone">
             <label class="note-checkbox">
               <input type="checkbox" id="showPhoneInBiodata" checked>
-              <span>Show this number in the biodata preview/PDF/image.</span>
+              <span data-i18n="note.showPhone">Show this number in the biodata preview/PDF/image.</span>
             </label>
           </div>
           <div>
-            <label class="req">Email ID</label>
-            <input id="email" type="email" placeholder="your@email.com" required>
+            <label class="req" data-i18n="formLabel.email">Email ID</label>
+            <input id="email" type="email" placeholder="your@email.com" required data-i18n-ph="ph.email">
           </div>
           <div>
-            <label>Father's Contact No.</label>
+            <label data-i18n="formLabel.father_contact_no">Father's Contact No.</label>
             <div class="phone-row">
               <select id="father_phone_code">
                   <option value="+91">+91</option>
@@ -795,16 +826,16 @@
                   <option value="+64">+64</option>
                   <option value="Other">Other</option>
               </select>
-              <input id="father_phone_number" type="tel" placeholder="10-digit mobile">
+              <input id="father_phone_number" type="tel" placeholder="10-digit mobile" data-i18n-ph="ph.phone_number_short">
             </div>
             <input type="hidden" id="father_phone">
             <label class="note-checkbox">
               <input type="checkbox" id="showFatherPhoneInBiodata" checked>
-              <span>Show this number in the biodata preview/PDF/image.</span>
+              <span data-i18n="note.showPhone">Show this number in the biodata preview/PDF/image.</span>
             </label>
           </div>
           <div>
-            <label>Mother's Contact No.</label>
+            <label data-i18n="formLabel.mother_contact_no">Mother's Contact No.</label>
             <div class="phone-row">
               <select id="mother_phone_code">
                   <option value="+91">+91</option>
@@ -818,42 +849,42 @@
                   <option value="+64">+64</option>
                   <option value="Other">Other</option>
               </select>
-              <input id="mother_phone_number" type="tel" placeholder="10-digit mobile">
+              <input id="mother_phone_number" type="tel" placeholder="10-digit mobile" data-i18n-ph="ph.phone_number_short">
             </div>
             <input type="hidden" id="mother_phone">
             <label class="note-checkbox">
               <input type="checkbox" id="showMotherPhoneInBiodata" checked>
-              <span>Show this number in the biodata preview/PDF/image.</span>
+              <span data-i18n="note.showPhone">Show this number in the biodata preview/PDF/image.</span>
             </label>
           </div>
         </div>
-        <label>Address</label>
-        <textarea id="current_address" placeholder="Full residential address"></textarea>
+        <label data-i18n="formLabel.address">Address</label>
+        <textarea id="current_address" placeholder="Full residential address" data-i18n-ph="ph.address"></textarea>
       </fieldset>
 
       <fieldset>
-        <legend>📸 Photo Upload</legend>
+        <legend data-i18n="legendPhoto">📸 Photo Upload</legend>
         <label class="photo-drop" id="photoDrop">
           <input type="file" id="photo" accept="image/jpeg,image/png" hidden>
           <span class="photo-drop-icon">📷</span>
-          <span id="photoDropLabel">Click to upload photo</span>
+          <span id="photoDropLabel" data-i18n="photoDropLabel">Click to upload photo</span>
         </label>
-        <div class="photo-note">* Only JPG, JPEG and PNG formats are accepted.</div>
-        <label>About Me</label>
-        <textarea id="about_me" placeholder="A few lines about yourself, hobbies, values, your conditions, requirements..."></textarea>
+        <div class="photo-note" data-i18n="photoNote">* Only JPG, JPEG and PNG formats are accepted.</div>
+        <label data-i18n="formLabel.about_me">About Me</label>
+        <textarea id="about_me" placeholder="A few lines about yourself, hobbies, values, your conditions, requirements..." data-i18n-ph="ph.about_me"></textarea>
       </fieldset>
 
       <div class="actions">
         <div class="btn-row">
-          <button type="button" id="pdfBtn">Download as PDF</button>
-          <button type="button" id="imageBtn" class="secondary">Download as Image</button>
+          <button type="button" id="pdfBtn" data-i18n="btn.pdf">Download as PDF</button>
+          <button type="button" id="imageBtn" class="secondary" data-i18n="btn.image">Download as Image</button>
         </div>
         <div class="btn-row" style="margin-top:10px;">
-          <button type="button" id="igBtn" class="secondary">📱 Instagram Style Template</button>
+          <button type="button" id="igBtn" class="secondary" data-i18n="btn.ig">📱 Instagram Style Template</button>
         </div>
         <label class="note-checkbox">
           <input type="checkbox" id="igIncludePhone">
-          <span>Include phone number in the Instagram image.</span>
+          <span data-i18n="note.igPhone">Include phone number in the Instagram image.</span>
         </label>
         <div id="status" class="status"></div>
       </div>
@@ -863,7 +894,7 @@
   <!-- PREVIEW -->
   <div id="previewWrap">
     <div class="template-picker" id="templatePicker">
-      <span class="tp-label">Template:</span>
+      <span class="tp-label" data-i18n="tpLabel">Template:</span>
       <button type="button" class="tp-swatch tp-classic" data-template="classic">Classic</button>
       <button type="button" class="tp-swatch tp-modern" data-template="modern">Modern</button>
       <button type="button" class="tp-swatch tp-elegant" data-template="elegant">Elegant</button>
@@ -871,20 +902,20 @@
     </div>
     <div id="card" class="tpl-classic">
       <div class="card-header">
-        <h2>Matrimonial Biodata</h2>
+        <h2 data-i18n="cardTitle">Matrimonial Biodata</h2>
         <div class="subtitle" id="cardSubtitle">Om Shri Ganeshaya Namah</div>
       </div>
 
       <div class="card-top">
-        <div id="photoBox">No Photo</div>
+        <div id="photoBox" data-i18n="noPhoto">No Photo</div>
         <div>
-          <div id="nameLine">Your Name</div>
+          <div id="nameLine" data-i18n="yourName">Your Name</div>
           <div id="aboutLine"></div>
         </div>
       </div>
 
       <div id="previewBody">
-        <div class="empty-hint">Fill the form to see your biodata preview here.</div>
+        <div class="empty-hint" data-i18n="emptyHint">Fill the form to see your biodata preview here.</div>
       </div>
     </div>
   </div>
@@ -894,9 +925,9 @@
 <!-- Instagram post card: rendered off-screen at a fixed 1080x1350 (4:5) size
      and captured to an image only when the user clicks "Instagram Style Template". -->
 <div id="igCard">
-  <div class="ig-eyebrow">Matrimonial Profile</div>
-  <div id="igPhotoBox">No Photo</div>
-  <div id="igName">Your Name</div>
+  <div class="ig-eyebrow" data-i18n="igEyebrow">Matrimonial Profile</div>
+  <div id="igPhotoBox" data-i18n="noPhoto">No Photo</div>
+  <div id="igName" data-i18n="yourName">Your Name</div>
   <div id="igTagline"></div>
   <div class="ig-divider"></div>
   <div id="igDetails"></div>
@@ -926,36 +957,287 @@ const FIELDS = [
   "current_address","phone","father_phone","mother_phone","email","about_me"
 ];
 
-const LABELS = {
-  first_name:"First Name", last_name:"Last Name",
-  dob:"Date of Birth",
-  marital_status:"Marital Status", caste:"Community", mother_tongue:"Mother Tongue",
-  mama_gotram:"Maternal Uncle's Gotram",
-  living_country:"Country", living_state:"State / Province", living_city:"City",
-  education:"Highest Qualification", college_name:"College Name", work_sector:"Work Sector",
-  occupation:"Job/Occupation", annual_income:"Annual Income", company_name:"Company Name",
-  father_name:"Father's Name", father_occupation:"Father's Occupation",
-  mother_name:"Mother's Name", mother_occupation:"Mother's Occupation", siblings_occupation:"Siblings' Occupation",
-  current_address:"Address", phone:"Contact No", father_phone:"Father's Contact No.",
-  mother_phone:"Mother's Contact No.", email:"Email ID"
+/* ============================================================
+   I18N — English/Telugu. Every static UI string, dropdown option
+   label, and JS-generated message lives here. Select elements keep
+   their canonical English `value` regardless of display language
+   (see applyOptionTranslations), so form data / Supabase records
+   stay consistent no matter which language was on screen when the
+   user filled them in.
+   ============================================================ */
+const I18N = {
+  en: {
+    appTitle: "Matrimonial Biodata Maker",
+    appSubtitle: "Fill in the details, pick a template, and download your biodata as a PDF or image.",
+    legendPersonal: "👤 Personal Details",
+    legendAstro: "✨ Astro Details",
+    legendEducation: "🎓 Education & Career",
+    legendFamily: "👪 Family Details",
+    legendContact: "📞 Contact Information",
+    legendPhoto: "📸 Photo Upload",
+    selectPlaceholder: "Select",
+    formLabel: {
+      first_name:"First Name", last_name:"Last Name", gender:"Gender", dob:"Date of Birth", height:"Height",
+      marital_status:"Marital Status", religion:"Religion", mother_tongue:"Mother Tongue", caste:"Community",
+      category:"Category", diet:"Diet", complexion:"Complexion", living_country:"Living In",
+      living_state:"State / Province", living_city:"City",
+      gothra:"Gothra", mama_gotram:"Maternal Uncle's Gotram", manglik:"Manglik", rashi:"Rashi (Moon Sign)", nakshatra:"Nakshatra",
+      education:"Highest Qualification", college_name:"College Name", work_sector:"Work Sector",
+      occupation:"Job/Occupation", company_name:"Company Name", annual_income:"Annual Income",
+      father_name:"Father's Name", father_occupation:"Father's Occupation", mother_name:"Mother's Name",
+      mother_occupation:"Mother's Occupation", siblings:"Siblings", siblings_occupation:"Siblings' Occupation",
+      contact_no:"Contact No", email:"Email ID", father_contact_no:"Father's Contact No.", mother_contact_no:"Mother's Contact No.",
+      address:"Address", about_me:"About Me"
+    },
+    previewLabel: {
+      first_name:"First Name", last_name:"Last Name", gender:"Gender", dob:"Date of Birth", height:"Height",
+      marital_status:"Marital Status", religion:"Religion", mother_tongue:"Mother Tongue", caste:"Community",
+      category:"Category", diet:"Diet", complexion:"Complexion",
+      living_country:"Country", living_state:"State / Province", living_city:"City",
+      gothra:"Gothra", mama_gotram:"Maternal Uncle's Gotram", manglik:"Manglik", rashi:"Rashi", nakshatra:"Nakshatra",
+      education:"Highest Qualification", college_name:"College Name", work_sector:"Work Sector",
+      occupation:"Job/Occupation", annual_income:"Annual Income", company_name:"Company Name",
+      father_name:"Father's Name", father_occupation:"Father's Occupation",
+      mother_name:"Mother's Name", mother_occupation:"Mother's Occupation", siblings:"Siblings", siblings_occupation:"Siblings' Occupation",
+      current_address:"Address", phone:"Contact No", father_phone:"Father's Contact No.",
+      mother_phone:"Mother's Contact No.", email:"Email ID"
+    },
+    ph: {
+      mother_tongue:"e.g., Hindi, Marathi",
+      caste:"Ex: Reddy, Kapu, Vysya, Brahmin etc.",
+      college_name:"College / University",
+      occupation:"e.g., Software Engineer",
+      company_name:"Company / Employer",
+      father_name:"Father's name",
+      occupation_generic:"Occupation",
+      mother_name:"Mother's name",
+      siblings:"e.g. 1 elder sister (married)",
+      siblings_occupation:"e.g. Teacher, Engineer",
+      phone_number:"10-digit mobile number",
+      phone_number_short:"10-digit mobile",
+      email:"your@email.com",
+      address:"Full residential address",
+      about_me:"A few lines about yourself, hobbies, values, your conditions, requirements..."
+    },
+    note: {
+      showPhone:"Show this number in the biodata preview/PDF/image.",
+      igPhone:"Include phone number in the Instagram image."
+    },
+    btn: { pdf:"Download as PDF", image:"Download as Image", ig:"📱 Instagram Style Template" },
+    tpLabel:"Template:",
+    photoDropLabel:"Click to upload photo",
+    photoNote:"* Only JPG, JPEG and PNG formats are accepted.",
+    cardTitle:"Matrimonial Biodata",
+    subtitles: { classic:"Om Shri Ganeshaya Namah", modern:"", elegant:"A New Beginning", royal:"" },
+    yourName:"Your Name",
+    noPhoto:"No Photo",
+    ageYears:"yrs",
+    emptyHint:"Fill the form to see your biodata preview here.",
+    groupTitle: { personal:"Personal", astro:"Astro Details", education:"Education & Career", family:"Family", contact:"Contact" },
+    igEyebrow:"Matrimonial Profile",
+    msg: {
+      requiredFields:"Please fill in all required fields (marked with *).",
+      savedGenerating:l => `Saved. Generating your ${l}...`,
+      saveFailed:l => `Could not save to database, but your ${l} will still be generated.`,
+      dbNotConfigured:"Database not configured yet — skipping save.",
+      savedAndDownloaded:l => `Saved and ${l} downloaded!`,
+      generationError:l => `Something went wrong generating the ${l}.`,
+      onlyJpgPng:"Only JPG, JPEG and PNG photos are accepted.",
+      igDownloaded:"Instagram image downloaded!",
+      igError:"Something went wrong generating the Instagram image.",
+      working:"Working..."
+    },
+    labelWord: { pdf:"PDF", image:"image", igImage:"Instagram image" },
+    options: {
+      gender: {Male:"Male", Female:"Female"},
+      marital_status: {"Never Married":"Never Married", Divorced:"Divorced", Widowed:"Widowed", Separated:"Separated"},
+      religion: {Hindu:"Hindu", Muslim:"Muslim", Christian:"Christian", Sikh:"Sikh", Parsi:"Parsi", Jain:"Jain", Buddhist:"Buddhist", Jewish:"Jewish", "No Religion":"No Religion", Spiritual:"Spiritual", "Spiritual - not religious":"Spiritual - not religious", Other:"Other"},
+      category: {OC:"OC", BC:"BC", SC:"SC", ST:"ST", Other:"Other"},
+      diet: {Veg:"Veg", "Non-Veg":"Non-Veg", Eggetarian:"Eggetarian", Vegan:"Vegan"},
+      complexion: {"Very Fair":"Very Fair", Fair:"Fair", Wheatish:"Wheatish", "Wheatish Brown":"Wheatish Brown", Dark:"Dark"},
+      living_country: {India:"India", USA:"USA", UK:"UK", Canada:"Canada", Australia:"Australia", UAE:"UAE", Singapore:"Singapore", "Saudi Arabia":"Saudi Arabia", Germany:"Germany", "New Zealand":"New Zealand", Other:"Other"},
+      manglik: {Yes:"Yes", No:"No", "Don't know":"Don't know"},
+      education: {"High School":"High School", Diploma:"Diploma", "Bachelor's Degree":"Bachelor's Degree", "Master's Degree":"Master's Degree", "Doctorate (PhD)":"Doctorate (PhD)", "Professional Degree":"Professional Degree", Other:"Other"},
+      work_sector: {"Government / PSU":"Government / PSU", "Private Sector":"Private Sector", "Business / Self-Employed":"Business / Self-Employed", Defence:"Defence", "Not Working":"Not Working", Other:"Other"},
+      annual_income: {"Below ₹2 Lakhs":"Below ₹2 Lakhs", "₹2 - 5 Lakhs":"₹2 - 5 Lakhs", "₹5 - 10 Lakhs":"₹5 - 10 Lakhs", "₹10 - 15 Lakhs":"₹10 - 15 Lakhs", "₹15 - 25 Lakhs":"₹15 - 25 Lakhs", "₹25 - 50 Lakhs":"₹25 - 50 Lakhs", "₹50 Lakhs+":"₹50 Lakhs+", "Prefer not to say":"Prefer not to say"}
+    }
+  },
+  te: {
+    appTitle: "వైవాహిక బయోడేటా మేకర్",
+    appSubtitle: "వివరాలు నింపి, టెంప్లేట్ ఎంచుకుని, మీ బయోడేటాను PDF లేదా చిత్రంగా డౌన్‌లోడ్ చేసుకోండి.",
+    legendPersonal: "👤 వ్యక్తిగత వివరాలు",
+    legendAstro: "✨ జాతక వివరాలు",
+    legendEducation: "🎓 విద్య & ఉద్యోగం",
+    legendFamily: "👪 కుటుంబ వివరాలు",
+    legendContact: "📞 సంప్రదింపు సమాచారం",
+    legendPhoto: "📸 ఫోటో అప్‌లోడ్",
+    selectPlaceholder: "ఎంచుకోండి",
+    formLabel: {
+      first_name:"మొదటి పేరు", last_name:"ఇంటిపేరు", gender:"లింగం", dob:"పుట్టిన తేదీ", height:"ఎత్తు",
+      marital_status:"వైవాహిక స్థితి", religion:"మతం", mother_tongue:"మాతృభాష", caste:"సామాజికవర్గం",
+      category:"వర్గం", diet:"ఆహారపు అలవాటు", complexion:"వర్ణం", living_country:"నివాసం",
+      living_state:"రాష్ట్రం", living_city:"నగరం",
+      gothra:"గోత్రం", mama_gotram:"మేనమామ గోత్రం", manglik:"మాంగల్యదోషం", rashi:"రాశి (చంద్ర రాశి)", nakshatra:"నక్షత్రం",
+      education:"విద్యార్హత", college_name:"కళాశాల పేరు", work_sector:"పని రంగం",
+      occupation:"ఉద్యోగం", company_name:"కంపెనీ పేరు", annual_income:"వార్షిక ఆదాయం",
+      father_name:"తండ్రి పేరు", father_occupation:"తండ్రి వృత్తి", mother_name:"తల్లి పేరు",
+      mother_occupation:"తల్లి వృత్తి", siblings:"తోబుట్టువులు", siblings_occupation:"తోబుట్టువుల వృత్తి",
+      contact_no:"సంప్రదింపు నంబర్", email:"ఇమెయిల్ ఐడి", father_contact_no:"తండ్రి సంప్రదింపు నంబర్", mother_contact_no:"తల్లి సంప్రదింపు నంబర్",
+      address:"చిరునామా", about_me:"నా గురించి"
+    },
+    previewLabel: {
+      first_name:"మొదటి పేరు", last_name:"ఇంటిపేరు", gender:"లింగం", dob:"పుట్టిన తేదీ", height:"ఎత్తు",
+      marital_status:"వైవాహిక స్థితి", religion:"మతం", mother_tongue:"మాతృభాష", caste:"సామాజికవర్గం",
+      category:"వర్గం", diet:"ఆహారపు అలవాటు", complexion:"వర్ణం",
+      living_country:"దేశం", living_state:"రాష్ట్రం", living_city:"నగరం",
+      gothra:"గోత్రం", mama_gotram:"మేనమామ గోత్రం", manglik:"మాంగల్యదోషం", rashi:"రాశి", nakshatra:"నక్షత్రం",
+      education:"విద్యార్హత", college_name:"కళాశాల పేరు", work_sector:"పని రంగం",
+      occupation:"ఉద్యోగం", annual_income:"వార్షిక ఆదాయం", company_name:"కంపెనీ పేరు",
+      father_name:"తండ్రి పేరు", father_occupation:"తండ్రి వృత్తి",
+      mother_name:"తల్లి పేరు", mother_occupation:"తల్లి వృత్తి", siblings:"తోబుట్టువులు", siblings_occupation:"తోబుట్టువుల వృత్తి",
+      current_address:"చిరునామా", phone:"సంప్రదింపు నంబర్", father_phone:"తండ్రి సంప్రదింపు నంబర్",
+      mother_phone:"తల్లి సంప్రదింపు నంబర్", email:"ఇమెయిల్ ఐడి"
+    },
+    ph: {
+      mother_tongue:"ఉదా: హిందీ, మరాఠీ",
+      caste:"ఉదా: రెడ్డి, కాపు, వైశ్య, బ్రాహ్మణ మొదలైనవి",
+      college_name:"కళాశాల / విశ్వవిద్యాలయం",
+      occupation:"ఉదా: సాఫ్ట్‌వేర్ ఇంజనీర్",
+      company_name:"కంపెనీ / యజమాని",
+      father_name:"తండ్రి పేరు",
+      occupation_generic:"వృత్తి",
+      mother_name:"తల్లి పేరు",
+      siblings:"ఉదా: 1 అక్క (వివాహితురాలు)",
+      siblings_occupation:"ఉదా: ఉపాధ్యాయురాలు, ఇంజనీర్",
+      phone_number:"10 అంకెల మొబైల్ నంబర్",
+      phone_number_short:"10 అంకెల మొబైల్",
+      email:"your@email.com",
+      address:"పూర్తి నివాస చిరునామా",
+      about_me:"మీ గురించి, అభిరుచులు, విలువలు, మీ షరతులు, అవసరాల గురించి కొన్ని పంక్తులు..."
+    },
+    note: {
+      showPhone:"ఈ నంబర్‌ను బయోడేటా ప్రివ్యూ/PDF/చిత్రంలో చూపించు.",
+      igPhone:"ఇన్‌స్టాగ్రామ్ చిత్రంలో ఫోన్ నంబర్‌ను చేర్చు."
+    },
+    btn: { pdf:"PDFగా డౌన్‌లోడ్ చేయండి", image:"చిత్రంగా డౌన్‌లోడ్ చేయండి", ig:"📱 ఇన్‌స్టాగ్రామ్ స్టైల్ టెంప్లేట్" },
+    tpLabel:"టెంప్లేట్:",
+    photoDropLabel:"ఫోటో అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి",
+    photoNote:"* JPG, JPEG మరియు PNG ఫార్మాట్‌లు మాత్రమే ఆమోదించబడతాయి.",
+    cardTitle:"వైవాహిక బయోడేటా",
+    subtitles: { classic:"ఓం శ్రీ గణేశాయ నమః", modern:"", elegant:"ఒక కొత్త ప్రారంభం", royal:"" },
+    yourName:"మీ పేరు",
+    noPhoto:"ఫోటో లేదు",
+    ageYears:"సం.",
+    emptyHint:"మీ బయోడేటా ప్రివ్యూ ఇక్కడ చూడటానికి ఫారమ్‌ను నింపండి.",
+    groupTitle: { personal:"వ్యక్తిగతం", astro:"జాతక వివరాలు", education:"విద్య & ఉద్యోగం", family:"కుటుంబం", contact:"సంప్రదింపు" },
+    igEyebrow:"వైవాహిక ప్రొఫైల్",
+    msg: {
+      requiredFields:"దయచేసి అన్ని అవసరమైన ఫీల్డ్‌లను (* గుర్తుతో ఉన్నవి) నింపండి.",
+      savedGenerating:l => `సేవ్ చేయబడింది. మీ ${l} తయారవుతోంది...`,
+      saveFailed:l => `డేటాబేస్‌కు సేవ్ చేయలేకపోయాము, కానీ మీ ${l} ఇప్పటికీ తయారవుతుంది.`,
+      dbNotConfigured:"డేటాబేస్ ఇంకా కాన్ఫిగర్ చేయబడలేదు — సేవ్ చేయడం దాటవేయబడుతోంది.",
+      savedAndDownloaded:l => `సేవ్ చేయబడింది మరియు ${l} డౌన్‌లోడ్ అయ్యింది!`,
+      generationError:l => `${l} తయారు చేయడంలో ఏదో తప్పు జరిగింది.`,
+      onlyJpgPng:"JPG, JPEG మరియు PNG ఫోటోలు మాత్రమే ఆమోదించబడతాయి.",
+      igDownloaded:"ఇన్‌స్టాగ్రామ్ చిత్రం డౌన్‌లోడ్ అయ్యింది!",
+      igError:"ఇన్‌స్టాగ్రామ్ చిత్రం తయారు చేయడంలో ఏదో తప్పు జరిగింది.",
+      working:"పని జరుగుతోంది..."
+    },
+    labelWord: { pdf:"PDF", image:"చిత్రం", igImage:"ఇన్‌స్టాగ్రామ్ చిత్రం" },
+    options: {
+      gender: {Male:"పురుషుడు", Female:"స్త్రీ"},
+      marital_status: {"Never Married":"అవివాహితులు", Divorced:"విడాకులు తీసుకున్న", Widowed:"వితంతువు/విధురుడు", Separated:"విడిపోయిన"},
+      religion: {Hindu:"హిందూ", Muslim:"ముస్లిం", Christian:"క్రైస్తవ", Sikh:"సిక్కు", Parsi:"పార్సీ", Jain:"జైన", Buddhist:"బౌద్ధ", Jewish:"యూదు", "No Religion":"మతం లేదు", Spiritual:"ఆధ్యాత్మికం", "Spiritual - not religious":"ఆధ్యాత్మికం - మతపరమైనది కాదు", Other:"ఇతర"},
+      category: {OC:"OC", BC:"BC", SC:"SC", ST:"ST", Other:"ఇతర"},
+      diet: {Veg:"శాఖాహారం", "Non-Veg":"మాంసాహారం", Eggetarian:"గుడ్డు ఆహారం", Vegan:"వీగన్"},
+      complexion: {"Very Fair":"మిక్కిలి తెలుపు", Fair:"తెలుపు", Wheatish:"గోధుమ రంగు", "Wheatish Brown":"ముదురు గోధుమ రంగు", Dark:"నలుపు"},
+      living_country: {India:"భారతదేశం", USA:"అమెరికా", UK:"యూకే", Canada:"కెనడా", Australia:"ఆస్ట్రేలియా", UAE:"యుఏఈ", Singapore:"సింగపూర్", "Saudi Arabia":"సౌదీ అరేబియా", Germany:"జర్మనీ", "New Zealand":"న్యూజిలాండ్", Other:"ఇతర"},
+      manglik: {Yes:"అవును", No:"కాదు", "Don't know":"తెలియదు"},
+      education: {"High School":"హైస్కూల్", Diploma:"డిప్లొమా", "Bachelor's Degree":"బ్యాచిలర్ డిగ్రీ", "Master's Degree":"మాస్టర్స్ డిగ్రీ", "Doctorate (PhD)":"డాక్టరేట్ (PhD)", "Professional Degree":"ప్రొఫెషనల్ డిగ్రీ", Other:"ఇతర"},
+      work_sector: {"Government / PSU":"ప్రభుత్వం / PSU", "Private Sector":"ప్రైవేట్ రంగం", "Business / Self-Employed":"వ్యాపారం / స్వయం ఉపాధి", Defence:"రక్షణ రంగం", "Not Working":"ఉద్యోగం లేదు", Other:"ఇతర"},
+      annual_income: {"Below ₹2 Lakhs":"₹2 లక్షల లోపు", "₹2 - 5 Lakhs":"₹2 - 5 లక్షలు", "₹5 - 10 Lakhs":"₹5 - 10 లక్షలు", "₹10 - 15 Lakhs":"₹10 - 15 లక్షలు", "₹15 - 25 Lakhs":"₹15 - 25 లక్షలు", "₹25 - 50 Lakhs":"₹25 - 50 లక్షలు", "₹50 Lakhs+":"₹50 లక్షలు+", "Prefer not to say":"చెప్పకూడదు అనుకుంటున్నాను"}
+    }
+  }
 };
 
-function label(f){
-  return LABELS[f] || f.replace(/_/g," ").replace(/\b\w/g, c => c.toUpperCase());
+let currentLang = "en";
+try{ currentLang = localStorage.getItem("biodata_lang") || "en"; }catch(e){}
+
+function t(){
+  return I18N[currentLang] || I18N.en;
 }
 
-const TEMPLATE_SUBTITLES = {
-  classic: "Om Shri Ganeshaya Namah",
-  modern: "",
-  elegant: "A New Beginning",
-  royal: ""
-};
+function label(f){
+  return t().previewLabel[f] || f;
+}
+
+// Select-based fields (religion, diet, education, ...) store a canonical
+// English value so form data / Supabase records stay consistent no matter
+// which language was on screen when filled in — this looks up the display
+// text for the current language, falling back to the raw value for free-text
+// fields (name, address, ...) that have no option map.
+function displayValue(fieldId, rawValue){
+  const optionMap = t().options[fieldId];
+  return (optionMap && optionMap[rawValue]) || rawValue;
+}
+
+function applyOptionTranslations(){
+  document.querySelectorAll("select[data-i18n-options]").forEach(select => {
+    const fieldKey = select.dataset.i18nOptions;
+    const optionMap = t().options[fieldKey];
+    if(!optionMap) return;
+    Array.from(select.options).forEach(opt => {
+      if(opt.value && optionMap[opt.value]) opt.textContent = optionMap[opt.value];
+    });
+  });
+}
+
+function applyStaticTranslations(){
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const path = el.dataset.i18n.split(".");
+    let v = t();
+    for(const part of path) v = v && v[part];
+    if(typeof v === "string") el.textContent = v;
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+    const path = el.dataset.i18nPh.split(".");
+    let v = t();
+    for(const part of path) v = v && v[part];
+    if(typeof v === "string") el.placeholder = v;
+  });
+  // #photoBox / #igPhotoBox show "No Photo" only until a photo is chosen —
+  // don't clobber an already-rendered <img> when switching language.
+  if(!photoDataUrl){
+    document.getElementById("photoBox").textContent = t().noPhoto;
+    document.getElementById("igPhotoBox").textContent = t().noPhoto;
+  }
+}
+
+function applyLanguage(lang){
+  currentLang = I18N.hasOwnProperty(lang) ? lang : "en";
+  try{ localStorage.setItem("biodata_lang", currentLang); }catch(e){}
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll("#langPicker button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lang === currentLang);
+  });
+  applyStaticTranslations();
+  applyOptionTranslations();
+  setTemplate(currentTemplate);
+  renderPreview();
+}
+
+document.querySelectorAll("#langPicker button").forEach(btn => {
+  btn.addEventListener("click", () => applyLanguage(btn.dataset.lang));
+});
+
+let currentTemplate = "classic";
 
 function setTemplate(name){
-  if(!TEMPLATE_SUBTITLES.hasOwnProperty(name)) name = "classic";
+  if(!I18N.en.subtitles.hasOwnProperty(name)) name = "classic";
+  currentTemplate = name;
   document.getElementById("card").className = "tpl-" + name;
   document.getElementById("igCard").className = "tpl-" + name;
-  document.getElementById("cardSubtitle").textContent = TEMPLATE_SUBTITLES[name];
+  document.getElementById("cardSubtitle").textContent = t().subtitles[name];
   document.querySelectorAll(".tp-swatch").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.template === name);
   });
@@ -986,7 +1268,7 @@ document.getElementById("photo").addEventListener("change", e => {
   if(!file) return;
 
   if(!ALLOWED_PHOTO_TYPES.includes(file.type)){
-    showStatus("err", "Only JPG, JPEG and PNG photos are accepted.");
+    showStatus("err", t().msg.onlyJpgPng);
     e.target.value = "";
     return;
   }
@@ -1021,15 +1303,15 @@ wirePhoneField("mother_phone_code", "mother_phone_number", "mother_phone");
 function renderPreview(){
   const name = [document.getElementById("first_name").value.trim(), document.getElementById("last_name").value.trim()]
     .filter(Boolean).join(" ");
-  document.getElementById("nameLine").textContent = name || "Your Name";
+  document.getElementById("nameLine").textContent = name || t().yourName;
   document.getElementById("aboutLine").textContent = document.getElementById("about_me").value.trim();
 
   const groups = [
-    {title:"Personal", fields:["gender","dob","height","marital_status","religion","mother_tongue","caste","category","diet","complexion","living_country","living_state","living_city"]},
-    {title:"Astro Details", fields:["gothra","mama_gotram","manglik","rashi","nakshatra"]},
-    {title:"Education & Career", fields:["education","college_name","work_sector","occupation","company_name","annual_income"]},
-    {title:"Family", fields:["father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation"]},
-    {title:"Contact", fields:["current_address","phone","father_phone","mother_phone","email"]}
+    {title:t().groupTitle.personal, fields:["gender","dob","height","marital_status","religion","mother_tongue","caste","category","diet","complexion","living_country","living_state","living_city"]},
+    {title:t().groupTitle.astro, fields:["gothra","mama_gotram","manglik","rashi","nakshatra"]},
+    {title:t().groupTitle.education, fields:["education","college_name","work_sector","occupation","company_name","annual_income"]},
+    {title:t().groupTitle.family, fields:["father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation"]},
+    {title:t().groupTitle.contact, fields:["current_address","phone","father_phone","mother_phone","email"]}
   ];
 
   const phoneVisibilityCheckbox = {
@@ -1047,7 +1329,7 @@ function renderPreview(){
         if(checkboxId && !document.getElementById(checkboxId).checked) return "";
         let v = document.getElementById(f).value.trim();
         if(!v) return "";
-        if(f === "dob") v = fmtDate(v);
+        v = f === "dob" ? fmtDate(v) : displayValue(f, v);
         hasAny = true;
         return `<div class="k">${label(f)}</div><div class="v">${escapeHtml(v)}</div>`;
       })
@@ -1059,7 +1341,7 @@ function renderPreview(){
 
   document.getElementById("previewBody").innerHTML = hasAny
     ? html
-    : '<div class="empty-hint">Fill the form to see your biodata preview here.</div>';
+    : `<div class="empty-hint">${escapeHtml(t().emptyHint)}</div>`;
 }
 
 function escapeHtml(s){
@@ -1192,17 +1474,20 @@ function validate(){
   const form = document.getElementById("bioForm");
   if(!form.checkValidity()){
     form.reportValidity();
-    showStatus("err", "Please fill in all required fields (marked with *).");
+    showStatus("err", t().msg.requiredFields);
     return false;
   }
   return true;
 }
 
-async function handleDownload(btn, defaultLabel, generator, savedLabel){
+async function handleDownload(btn, btnLabelKey, generator){
   if(!validate()) return;
 
+  const defaultLabel = t().btn[btnLabelKey];
+  const savedLabel = t().labelWord[btnLabelKey];
+
   btn.disabled = true;
-  btn.textContent = "Working...";
+  btn.textContent = t().msg.working;
 
   try{
     // Rendered once here and reused below so we don't pay for html2canvas twice.
@@ -1211,23 +1496,23 @@ async function handleDownload(btn, defaultLabel, generator, savedLabel){
     if(supabaseClient && !savedToDb){
       try{
         await saveToDbIfNeeded(cardCanvas);
-        showStatus("ok", "Saved. Generating your " + savedLabel + "...");
+        showStatus("ok", t().msg.savedGenerating(savedLabel));
       }catch(err){
         console.error(err);
-        showStatus("err", "Could not save to database, but your " + savedLabel + " will still be generated.");
+        showStatus("err", t().msg.saveFailed(savedLabel));
       }
     } else if(!supabaseClient){
-      showStatus("warn", "Database not configured yet — skipping save.");
+      showStatus("warn", t().msg.dbNotConfigured);
     }
 
     await generator(cardCanvas);
 
     if(supabaseClient && savedToDb){
-      showStatus("ok", "Saved and " + savedLabel + " downloaded!");
+      showStatus("ok", t().msg.savedAndDownloaded(savedLabel));
     }
   }catch(err){
     console.error(err);
-    showStatus("err", "Something went wrong generating the " + savedLabel + ".");
+    showStatus("err", t().msg.generationError(savedLabel));
   }finally{
     btn.disabled = false;
     btn.textContent = defaultLabel;
@@ -1236,12 +1521,12 @@ async function handleDownload(btn, defaultLabel, generator, savedLabel){
 
 document.getElementById("pdfBtn").addEventListener("click", () => {
   const btn = document.getElementById("pdfBtn");
-  handleDownload(btn, "Download as PDF", generatePdf, "PDF");
+  handleDownload(btn, "pdf", generatePdf);
 });
 
 document.getElementById("imageBtn").addEventListener("click", () => {
   const btn = document.getElementById("imageBtn");
-  handleDownload(btn, "Download as Image", generateImage, "image");
+  handleDownload(btn, "image", generateImage);
 });
 
 function calcAge(dobStr){
@@ -1261,29 +1546,29 @@ function val(id){
 
 function renderIgCard(){
   const name = [val("first_name"), val("last_name")].filter(Boolean).join(" ");
-  document.getElementById("igName").textContent = name || "Your Name";
+  document.getElementById("igName").textContent = name || t().yourName;
 
   const age = calcAge(document.getElementById("dob").value);
   const height = val("height");
-  const diet = val("diet");
-  const tagline = [age ? age + " yrs" : "", height, diet].filter(Boolean).join("  •  ");
+  const diet = displayValue("diet", val("diet"));
+  const tagline = [age ? age + " " + t().ageYears : "", height, diet].filter(Boolean).join("  •  ");
   document.getElementById("igTagline").textContent = tagline;
 
   const rows = [];
-  const educationLine = [val("education"), val("college_name")].filter(Boolean).join(", ");
+  const educationLine = [displayValue("education", val("education")), val("college_name")].filter(Boolean).join(", ");
   if(educationLine) rows.push("🎓 " + educationLine);
 
   const occupation = val("occupation");
   const company = val("company_name");
   if(occupation || company) rows.push("💼 " + occupation + (company ? " at " + company : ""));
 
-  const annualIncome = val("annual_income");
+  const annualIncome = displayValue("annual_income", val("annual_income"));
   if(annualIncome) rows.push("💰 " + annualIncome);
 
-  const loc = [val("living_city"), val("living_state"), val("living_country")].filter(Boolean).join(", ");
+  const loc = [val("living_city"), val("living_state"), displayValue("living_country", val("living_country"))].filter(Boolean).join(", ");
   if(loc) rows.push("📍 " + loc);
 
-  const rel = [val("religion"), val("caste")].filter(Boolean).join("  •  ");
+  const rel = [displayValue("religion", val("religion")), val("caste")].filter(Boolean).join("  •  ");
   if(rel) rows.push("🕉️ " + rel);
 
   document.getElementById("igDetails").innerHTML = rows
@@ -1291,7 +1576,7 @@ function renderIgCard(){
     .join("");
 
   const photoBox = document.getElementById("igPhotoBox");
-  photoBox.innerHTML = photoDataUrl ? `<img src="${photoDataUrl}" alt="photo">` : "No Photo";
+  photoBox.innerHTML = photoDataUrl ? `<img src="${photoDataUrl}" alt="photo">` : t().noPhoto;
 
   const includePhone = document.getElementById("igIncludePhone").checked;
   const phone = val("phone");
@@ -1318,20 +1603,22 @@ async function generateInstagramImage(){
 document.getElementById("igBtn").addEventListener("click", async () => {
   if(!validate()) return;
   const btn = document.getElementById("igBtn");
-  const original = btn.textContent;
+  const defaultLabel = t().btn.ig;
   btn.disabled = true;
-  btn.textContent = "Working...";
+  btn.textContent = t().msg.working;
   try{
     await generateInstagramImage();
-    showStatus("ok", "Instagram image downloaded!");
+    showStatus("ok", t().msg.igDownloaded);
   }catch(err){
     console.error(err);
-    showStatus("err", "Something went wrong generating the Instagram image.");
+    showStatus("err", t().msg.igError);
   }finally{
     btn.disabled = false;
-    btn.textContent = original;
+    btn.textContent = defaultLabel;
   }
 });
+
+applyLanguage(currentLang);
 </script>
 </body>
 </html>
