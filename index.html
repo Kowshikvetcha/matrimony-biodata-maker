@@ -390,6 +390,70 @@
     border-radius:4px 4px 0 0;
   }
   #card.tpl-royal .subtitle{color:#c9a24b;}
+
+  /* Instagram post card — condensed, fixed-size (4:5), rendered off-screen
+     and only captured to an image on demand. */
+  .ig-note{
+    display:flex;
+    align-items:flex-start;
+    gap:6px;
+    font-size:.78rem;
+    color:var(--muted);
+    margin:10px 0 0;
+  }
+  .ig-note input{width:auto;margin-top:2px;}
+  #igCard{
+    position:absolute;
+    left:-9999px;
+    top:0;
+    width:1080px;
+    height:1350px;
+    box-sizing:border-box;
+    padding:70px 80px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    background:linear-gradient(160deg,#fff8f0 0%, #fbeef2 100%);
+    border:14px solid var(--gold);
+    outline:2px solid var(--maroon);
+    outline-offset:-24px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+  }
+  .ig-eyebrow{
+    font-size:28px;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--maroon);
+    font-weight:700;
+    margin-bottom:30px;
+  }
+  #igPhotoBox{
+    width:340px;height:340px;border-radius:50%;
+    border:8px solid var(--gold);
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    overflow:hidden;
+    background:#f4ede1;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--muted);font-size:20px;
+    margin-bottom:30px;
+    flex-shrink:0;
+  }
+  #igPhotoBox img{width:100%;height:100%;object-fit:cover;}
+  #igName{font-size:52px;font-weight:800;color:var(--maroon-dark);margin-bottom:10px;line-height:1.2;}
+  #igTagline{font-size:27px;color:#555;margin-bottom:28px;}
+  .ig-divider{width:120px;height:3px;background:var(--gold);margin:0 0 32px;flex-shrink:0;}
+  #igDetails{font-size:25px;line-height:2.15;color:var(--ink);}
+  #igFooter{
+    margin-top:auto;
+    padding-top:26px;
+    border-top:2px solid var(--border);
+    font-size:26px;
+    color:var(--maroon-dark);
+    font-weight:700;
+    width:100%;
+  }
 </style>
 </head>
 <body>
@@ -759,6 +823,13 @@
           <button type="button" id="pdfBtn">Download as PDF</button>
           <button type="button" id="imageBtn" class="secondary">Download as Image</button>
         </div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button type="button" id="igBtn" class="secondary">📱 Download for Instagram</button>
+        </div>
+        <label class="ig-note">
+          <input type="checkbox" id="igIncludePhone">
+          <span>Include phone number in the Instagram image (it will be publicly visible to anyone who sees the post).</span>
+        </label>
         <div id="status" class="status"></div>
       </div>
     </form>
@@ -793,6 +864,18 @@
     </div>
   </div>
 
+</div>
+
+<!-- Instagram post card: rendered off-screen at a fixed 1080x1350 (4:5) size
+     and captured to an image only when the user clicks "Download for Instagram". -->
+<div id="igCard">
+  <div class="ig-eyebrow">Matrimonial Alliance</div>
+  <div id="igPhotoBox">No Photo</div>
+  <div id="igName">Your Name</div>
+  <div id="igTagline"></div>
+  <div class="ig-divider"></div>
+  <div id="igDetails"></div>
+  <div id="igFooter"></div>
 </div>
 
 <script>
@@ -1125,6 +1208,92 @@ document.getElementById("pdfBtn").addEventListener("click", () => {
 document.getElementById("imageBtn").addEventListener("click", () => {
   const btn = document.getElementById("imageBtn");
   handleDownload(btn, "Download as Image", generateImage, "image");
+});
+
+function calcAge(dobStr){
+  if(!dobStr) return null;
+  const dob = new Date(dobStr + "T00:00:00");
+  if(isNaN(dob)) return null;
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+  if(m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+  return age;
+}
+
+function val(id){
+  return document.getElementById(id).value.trim();
+}
+
+function renderIgCard(){
+  const name = [val("first_name"), val("last_name")].filter(Boolean).join(" ");
+  document.getElementById("igName").textContent = name || "Your Name";
+
+  const age = calcAge(document.getElementById("dob").value);
+  const height = val("height");
+  const diet = val("diet");
+  const tagline = [age ? age + " yrs" : "", height, diet].filter(Boolean).join("  •  ");
+  document.getElementById("igTagline").textContent = tagline;
+
+  const rows = [];
+  const educationLine = [val("education"), val("college_name")].filter(Boolean).join(", ");
+  if(educationLine) rows.push("🎓 " + educationLine);
+
+  const occupation = val("occupation");
+  const company = val("company_name");
+  if(occupation || company) rows.push("💼 " + occupation + (company ? " at " + company : ""));
+
+  const loc = [val("living_city"), val("living_state"), val("living_country")].filter(Boolean).join(", ");
+  if(loc) rows.push("📍 " + loc);
+
+  const rel = [val("religion"), val("caste")].filter(Boolean).join("  •  ");
+  if(rel) rows.push("🕉️ " + rel);
+
+  document.getElementById("igDetails").innerHTML = rows
+    .map(r => `<div>${escapeHtml(r)}</div>`)
+    .join("");
+
+  const photoBox = document.getElementById("igPhotoBox");
+  photoBox.innerHTML = photoDataUrl ? `<img src="${photoDataUrl}" alt="photo">` : "No Photo";
+
+  const includePhone = document.getElementById("igIncludePhone").checked;
+  const phone = val("phone");
+  const footer = document.getElementById("igFooter");
+  if(includePhone && phone){
+    footer.textContent = "📞 " + phone;
+    footer.style.display = "block";
+  } else {
+    footer.textContent = "";
+    footer.style.display = "none";
+  }
+}
+
+async function generateInstagramImage(){
+  renderIgCard();
+  const card = document.getElementById("igCard");
+  const canvas = await html2canvas(card, {scale:1, backgroundColor:"#fff8f0", width:1080, height:1350});
+  const link = document.createElement("a");
+  link.download = `${fileNameBase()}_instagram.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+document.getElementById("igBtn").addEventListener("click", async () => {
+  if(!validate()) return;
+  const btn = document.getElementById("igBtn");
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Working...";
+  try{
+    await generateInstagramImage();
+    showStatus("ok", "Instagram image downloaded!");
+  }catch(err){
+    console.error(err);
+    showStatus("err", "Something went wrong generating the Instagram image.");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 });
 </script>
 </body>
