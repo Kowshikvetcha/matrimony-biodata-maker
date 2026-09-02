@@ -1243,6 +1243,9 @@ function renderIgCard(){
   const company = val("company_name");
   if(occupation || company) rows.push("💼 " + occupation + (company ? " at " + company : ""));
 
+  const annualIncome = val("annual_income");
+  if(annualIncome) rows.push("💰 " + annualIncome);
+
   const loc = [val("living_city"), val("living_state"), val("living_country")].filter(Boolean).join(", ");
   if(loc) rows.push("📍 " + loc);
 
