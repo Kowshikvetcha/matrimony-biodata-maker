@@ -798,6 +798,10 @@
               <input id="father_phone_number" type="tel" placeholder="10-digit mobile">
             </div>
             <input type="hidden" id="father_phone">
+            <label class="note-checkbox">
+              <input type="checkbox" id="showFatherPhoneInBiodata" checked>
+              <span>Show this number in the biodata preview/PDF/image.</span>
+            </label>
           </div>
           <div>
             <label>Mother's Contact No.</label>
@@ -817,6 +821,10 @@
               <input id="mother_phone_number" type="tel" placeholder="10-digit mobile">
             </div>
             <input type="hidden" id="mother_phone">
+            <label class="note-checkbox">
+              <input type="checkbox" id="showMotherPhoneInBiodata" checked>
+              <span>Show this number in the biodata preview/PDF/image.</span>
+            </label>
           </div>
         </div>
         <label>Address</label>
@@ -1024,14 +1032,19 @@ function renderPreview(){
     {title:"Contact", fields:["current_address","phone","father_phone","mother_phone","email"]}
   ];
 
-  const showPhone = document.getElementById("showPhoneInBiodata").checked;
+  const phoneVisibilityCheckbox = {
+    phone: "showPhoneInBiodata",
+    father_phone: "showFatherPhoneInBiodata",
+    mother_phone: "showMotherPhoneInBiodata"
+  };
 
   let html = "";
   let hasAny = false;
   for(const g of groups){
     const rows = g.fields
       .map(f => {
-        if(f === "phone" && !showPhone) return "";
+        const checkboxId = phoneVisibilityCheckbox[f];
+        if(checkboxId && !document.getElementById(checkboxId).checked) return "";
         let v = document.getElementById(f).value.trim();
         if(!v) return "";
         if(f === "dob") v = fmtDate(v);
