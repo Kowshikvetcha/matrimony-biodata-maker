@@ -6,10 +6,7 @@ create table public.biodata_submissions (
   last_name text,
   gender text,
   dob date,
-  time_of_birth text,
-  place_of_birth text,
   height text,
-  weight text,
   complexion text,
   marital_status text,
   religion text,
@@ -19,7 +16,6 @@ create table public.biodata_submissions (
   living_country text,
   living_state text,
   living_city text,
-  sub_caste text,
   gothra text,
   mama_gotram text,
   mother_tongue text,
@@ -44,6 +40,7 @@ create table public.biodata_submissions (
   mother_phone text,
   email text,
   about_me text,
+  requirements text,
   photo_url text,
   card_image_url text
 );
@@ -100,10 +97,9 @@ create policy "Anon upload of biodata cards"
 -- bring an existing biodata_submissions table up to date with the
 -- shaadi.com-style form fields added later). Safe to skip if
 -- you're running this whole file fresh on a brand new project.
---
--- Note: `family_type` is left in place if it already exists — it's
--- just no longer written to by the form. Harmless to leave; drop
--- it yourself later if you want a fully clean schema.
+-- Every add-column line below is non-destructive and safe to
+-- re-run any number of times — existing rows just get NULL in a
+-- newly added column, nothing is ever overwritten or removed.
 -- ============================================================
 alter table public.biodata_submissions
   add column if not exists first_name text,
@@ -119,7 +115,20 @@ alter table public.biodata_submissions
   add column if not exists category text,
   add column if not exists siblings text,
   add column if not exists siblings_occupation text,
-  add column if not exists mama_gotram text;
+  add column if not exists mama_gotram text,
+  add column if not exists requirements text;
 
+-- ============================================================
+-- CLEANUP — drops columns the form no longer writes to.
+-- DROP COLUMN is NOT reversible from the SQL editor: back up first
+-- if you haven't confirmed these are empty/unwanted, e.g.
+--   create table public.biodata_submissions_backup as
+--   select * from public.biodata_submissions;
+-- ============================================================
 alter table public.biodata_submissions
-  drop column if exists full_name;
+  drop column if exists full_name,
+  drop column if exists family_type,
+  drop column if exists time_of_birth,
+  drop column if exists place_of_birth,
+  drop column if exists weight,
+  drop column if exists sub_caste;

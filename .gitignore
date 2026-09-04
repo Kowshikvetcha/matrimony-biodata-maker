@@ -1,0 +1,10 @@
+# Local test tooling (Playwright) — not tracked or shipped with the app.
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+package.json
+package-lock.json
+playwright.config.js
+tests/

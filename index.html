@@ -1,97 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
 <title>Matrimonial Biodata Maker</title>
 <link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --maroon:#7a2048;
-    --maroon-dark:#5c1636;
+    --maroon:#7d1a3a;
+    --maroon-dark:#540f28;
+    --maroon-soft:#fbeef1;
     --gold:#c9a24b;
-    --cream:#fff8f0;
-    --ink:#2b2b2b;
-    --muted:#8a8a8a;
-    --border:#e6dccb;
+    --gold-dark:#a67c2e;
+    --gold-soft:#f7ecd3;
+    --cream:#fdf8f0;
+    --ink:#2c2420;
+    --muted:#8c8074;
+    --border:#ece0cd;
     --danger:#b3261e;
     --surface:#ffffff;
-    --surface-tint:#faf7f2;
-    --radius-sm:8px;
-    --radius-md:14px;
-    --radius-lg:20px;
-    --shadow-sm:0 1px 2px rgba(30,15,20,.05);
-    --shadow-md:0 6px 20px rgba(30,15,20,.07);
-    --shadow-lg:0 14px 36px rgba(30,15,20,.14);
-    --transition:160ms ease;
+    --surface-tint:#fbf6ec;
+    --radius-sm:12px;
+    --radius-md:18px;
+    --radius-lg:26px;
+    --radius-pill:999px;
+    --shadow-sm:0 1px 3px rgba(60,20,30,.06);
+    --shadow-md:0 10px 28px rgba(60,20,30,.08);
+    --shadow-lg:0 20px 48px rgba(60,20,30,.16);
+    --transition:180ms ease;
+    --font-display:'Playfair Display',Georgia,'Times New Roman',serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;}
   body{
     margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:linear-gradient(180deg,#fbf6ef 0%,#f2ece1 220px, #f2ece1 100%);
+    font-family:var(--font-body);
+    background:linear-gradient(180deg,#fdf9f2 0%,#f7f0e3 260px, #f5eee0 100%);
     color:var(--ink);
     -webkit-font-smoothing:antialiased;
   }
   header{
-    position:relative;
-    background:linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
-    color:#fff;
-    padding:clamp(28px,5vw,40px) 20px clamp(32px,6vw,44px);
-    text-align:center;
-    box-shadow:var(--shadow-lg);
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:10px;
+    background:var(--cream);
+    color:var(--ink);
+    border-bottom:1px solid var(--border);
+    padding:12px 16px;
   }
   .lang-picker{
-    position:absolute;
-    top:14px;
-    right:16px;
-    display:flex;
-    gap:4px;
-  }
-  .lang-picker button{
-    padding:6px 12px;
-    font-size:.78rem;
-    font-weight:700;
-    border-radius:20px;
-    border:1.5px solid rgba(255,255,255,.5);
-    background:transparent;
-    color:#fff;
-    opacity:.8;
-  }
-  .lang-picker button.active{
-    background:#fff;
-    color:var(--maroon-dark);
-    border-color:#fff;
-    opacity:1;
-  }
-  @media(max-width:520px){
-    .lang-picker{position:static; justify-content:center; margin-bottom:10px;}
-  }
-  header h1{
-    margin:0;
-    font-size:clamp(1.4rem,4.5vw,2rem);
-    letter-spacing:.2px;
-    font-weight:800;
+    grid-column:3;
+    justify-self:end;
     display:flex;
     align-items:center;
-    justify-content:center;
-    gap:10px;
+    gap:5px;
+    padding:5px 10px 5px 12px;
+    border-radius:var(--radius-pill);
+    border:1.5px solid var(--border);
+    background:var(--surface);
+  }
+  .lang-picker .lang-icon{font-size:.8rem;line-height:1;}
+  .lang-picker select{
+    width:auto;
+    border:none;
+    background:transparent;
+    padding:0 16px 0 0;
+    margin:0;
+    font-size:.78rem;
+    font-weight:700;
+    color:var(--maroon);
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--maroon) 50%),linear-gradient(135deg,var(--maroon) 50%,transparent 50%);
+    background-position:calc(100% - 9px) 55%, calc(100% - 5px) 55%;
+    background-size:5px 5px, 5px 5px;
+    background-repeat:no-repeat;
+  }
+  .lang-picker select:focus{outline:none;box-shadow:none;border:none;}
+  header h1{
+    grid-column:2;
+    margin:0;
+    font-family:var(--font-display);
+    font-size:clamp(1rem,3.6vw,1.6rem);
+    letter-spacing:.2px;
+    font-weight:700;
+    color:var(--maroon);
+    text-align:center;
+    white-space:nowrap;
   }
   header h1 .logo{
-    width:1.2em;
-    height:1.2em;
-    flex-shrink:0;
+    width:1.15em;
+    height:1.15em;
+    vertical-align:-.2em;
+    margin-right:8px;
   }
-  header p{
-    margin:10px auto 0;
-    font-size:clamp(.85rem,2vw,.98rem);
-    opacity:.88;
-    max-width:520px;
-    line-height:1.5;
+  @media(max-width:360px){
+    header h1{white-space:normal;font-size:.92rem;}
   }
   .layout{
     display:grid;
@@ -111,30 +125,33 @@
   .panel{
     background:var(--surface);
     border:1px solid var(--border);
-    border-radius:var(--radius-md);
-    padding:24px 26px;
+    border-radius:var(--radius-lg);
+    padding:26px 28px;
     box-shadow:var(--shadow-md);
   }
   @media(max-width:600px){
-    .panel{padding:18px 16px; border-radius:var(--radius-sm);}
+    .panel{padding:18px 16px; border-radius:var(--radius-md);}
   }
   fieldset{
     border:1px solid var(--border);
-    background:var(--surface-tint);
-    border-radius:var(--radius-sm);
-    margin:0 0 16px;
-    padding:16px 18px 20px;
+    background:var(--surface);
+    border-radius:var(--radius-md);
+    margin:0 0 20px;
+    padding:18px 20px 22px;
+    box-shadow:var(--shadow-sm);
   }
   legend{
+    font-family:var(--font-display);
     font-weight:700;
-    color:var(--maroon-dark);
-    padding:0 10px;
-    font-size:.92rem;
+    color:var(--maroon);
+    padding:0 12px;
+    font-size:1rem;
+    letter-spacing:.2px;
   }
   .grid2{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:12px 14px;
+    gap:14px 16px;
   }
   @media(max-width:520px){ .grid2{grid-template-columns:1fr;} }
   .phone-row{
@@ -148,62 +165,80 @@
     align-items:center;
     justify-content:center;
     gap:6px;
-    padding:26px 16px;
-    border:1.5px dashed #d9d0c0;
-    border-radius:var(--radius-sm);
-    background:#fff;
+    padding:28px 16px;
+    border:1.5px dashed var(--gold);
+    border-radius:var(--radius-md);
+    background:var(--gold-soft);
     cursor:pointer;
     text-align:center;
     color:var(--muted);
     font-size:.9rem;
     transition:border-color var(--transition), background var(--transition);
   }
-  .photo-drop:hover{border-color:var(--maroon);background:#fbeff4;}
+  .photo-drop:hover{border-color:var(--maroon);background:var(--maroon-soft);}
   .photo-drop-icon{font-size:1.6rem;}
   .photo-note{
     font-size:.75rem;
     color:var(--danger);
     margin-top:6px;
   }
+  .char-count{
+    font-size:.75rem;
+    color:var(--muted);
+    text-align:right;
+    margin-top:4px;
+  }
+  .char-count.char-count-limit{color:var(--danger);}
+  .field-meta-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:4px;
+  }
+  .field-meta-row .note-checkbox{margin:0;}
+  .field-meta-row .char-count{margin:0;white-space:nowrap;}
   label{
     display:block;
-    font-size:.8rem;
+    font-size:.82rem;
     color:var(--muted);
-    margin:8px 0 4px;
+    margin:10px 0 5px;
   }
   input,select,textarea{
     width:100%;
-    padding:10px 12px;
-    border:1px solid #d9d0c0;
+    padding:11px 13px;
+    border:1px solid var(--border);
     border-radius:var(--radius-sm);
     font-size:.92rem;
     font-family:inherit;
     background:#fff;
+    color:var(--ink);
     transition:border-color var(--transition), box-shadow var(--transition);
   }
-  input:hover,select:hover,textarea:hover{border-color:#c9bda5;}
+  input:hover,select:hover,textarea:hover{border-color:var(--gold);}
   input:focus,select:focus,textarea:focus{
     outline:none;
     border-color:var(--maroon);
-    box-shadow:0 0 0 3px rgba(122,32,72,.12);
+    box-shadow:0 0 0 3px rgba(125,26,58,.12);
   }
   textarea{resize:vertical;min-height:60px;}
   .req::after{content:" *";color:var(--danger);}
   .actions{
     position:sticky;
     bottom:0;
-    background:#fff;
+    background:var(--surface);
     padding:16px 0 4px;
-    margin-top:8px;
-    box-shadow:0 -10px 14px -10px rgba(0,0,0,.07);
+    margin-top:10px;
+    box-shadow:0 -10px 14px -10px rgba(0,0,0,.05);
   }
   button{
     cursor:pointer;
     border:none;
-    border-radius:var(--radius-sm);
+    border-radius:var(--radius-pill);
     font-size:.95rem;
     font-weight:600;
-    padding:13px 18px;
+    padding:13px 20px;
+    font-family:inherit;
     transition:background var(--transition), box-shadow var(--transition), transform var(--transition);
   }
   .btn-row{
@@ -211,29 +246,32 @@
     gap:10px;
     flex-wrap:wrap;
   }
-  .btn-row button{flex:1;min-width:160px;}
+  .btn-row button{flex:1 1 150px;}
+  @media(max-width:600px){
+    .btn-row{gap:8px;}
+    .btn-row button{flex-basis:calc(50% - 4px);padding:11px 10px;font-size:.82rem;}
+  }
   .btn-row button:not(.secondary){
-    background:var(--maroon);
+    background:linear-gradient(135deg,var(--maroon) 0%,var(--maroon-dark) 100%);
     color:#fff;
     box-shadow:var(--shadow-sm);
   }
-  .btn-row button:not(.secondary):hover{background:var(--maroon-dark);box-shadow:var(--shadow-md);}
+  .btn-row button:not(.secondary):hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
   .btn-row button:active{transform:translateY(1px);}
   .btn-row button.secondary{
     background:#fff;
     color:var(--maroon);
     border:1.5px solid var(--maroon);
   }
-  .btn-row button.secondary:hover{background:#fbeff4;}
-  .btn-row button:disabled{background:#c9a9b8;color:#fff;border-color:transparent;cursor:not-allowed;transform:none;box-shadow:none;}
-  @media(max-width:420px){
-    .btn-row{flex-direction:column;}
-    .btn-row button{min-width:0;}
+  .btn-row button.secondary:hover{background:var(--maroon-soft);}
+  .btn-row button:disabled{background:#d3adbc;color:#fff;border-color:transparent;cursor:not-allowed;transform:none;box-shadow:none;}
+  @media(max-width:340px){
+    .btn-row button{flex-basis:100%;}
   }
   .status{
     margin-top:10px;
     font-size:.85rem;
-    padding:8px 10px;
+    padding:9px 12px;
     border-radius:var(--radius-sm);
     display:none;
   }
@@ -247,74 +285,81 @@
     align-items:center;
     gap:8px;
     flex-wrap:wrap;
-    margin-bottom:12px;
+    margin-bottom:14px;
+    padding:0 2px;
   }
-  .tp-label{font-size:.8rem;color:var(--muted);margin-right:2px;}
+  .tp-label{font-size:.82rem;color:var(--muted);margin-right:2px;font-weight:600;}
   .tp-swatch{
     display:inline-flex;
     align-items:center;
-    gap:6px;
-    padding:6px 12px;
-    border-radius:20px;
-    border:1px solid var(--border);
+    gap:7px;
+    padding:7px 14px;
+    border-radius:var(--radius-pill);
+    border:1.5px solid var(--border);
     background:#fff;
     font-size:.78rem;
     font-weight:600;
     color:var(--ink);
     cursor:pointer;
-    transition:background var(--transition), border-color var(--transition);
+    transition:background var(--transition), border-color var(--transition), box-shadow var(--transition);
   }
   .tp-swatch::before{
     content:"";
-    width:11px;height:11px;border-radius:50%;
+    width:10px;height:10px;border-radius:50%;
     background:var(--dot);
     display:inline-block;
   }
-  .tp-swatch.tp-classic{--dot:#7a2048;}
+  .tp-swatch.tp-classic{--dot:#7d1a3a;}
   .tp-swatch.tp-modern{--dot:#1f3a5f;}
   .tp-swatch.tp-elegant{--dot:#b23a5e;}
   .tp-swatch.tp-royal{--dot:#12233f;}
-  .tp-swatch.tp-classic.active{background:#fbeff4;border-color:#7a2048;}
-  .tp-swatch.tp-modern.active{background:#eef3f8;border-color:#1f3a5f;}
-  .tp-swatch.tp-elegant.active{background:#fdeef1;border-color:#b23a5e;}
-  .tp-swatch.tp-royal.active{background:#eef1f6;border-color:#12233f;}
+  .tp-swatch.tp-classic.active{background:var(--maroon-soft);border-color:#7d1a3a;box-shadow:var(--shadow-sm);}
+  .tp-swatch.tp-modern.active{background:#eef3f8;border-color:#1f3a5f;box-shadow:var(--shadow-sm);}
+  .tp-swatch.tp-elegant.active{background:#fdeef1;border-color:#b23a5e;box-shadow:var(--shadow-sm);}
+  .tp-swatch.tp-royal.active{background:#eef1f6;border-color:#12233f;box-shadow:var(--shadow-sm);}
 
   /* Preview / biodata card */
   #previewWrap{position:sticky;top:20px;align-self:start;}
   #card{
-    --c-bg:#fffdf8;
+    --c-bg:#fffdf9;
     --c-border:var(--gold);
-    --c-border-width:2px;
-    --c-radius:10px;
-    --c-heading:var(--maroon);
-    --c-heading-font:inherit;
+    --c-border-width:1.5px;
+    --c-radius:22px;
+    --c-header-bg:linear-gradient(135deg,var(--maroon) 0%,var(--maroon-dark) 100%);
+    --c-header-fg:#ffffff;
+    --c-header-sub:var(--gold);
+    --c-heading-font:var(--font-display);
     --c-heading-style:normal;
     --c-heading-align:center;
     --c-name:var(--maroon-dark);
     --c-accent:var(--maroon);
     --c-divider:var(--border);
-    --c-shadow:0 4px 18px rgba(0,0,0,.06);
+    --c-shadow:var(--shadow-md);
 
     background:var(--c-bg);
     border:var(--c-border-width) solid var(--c-border);
     border-radius:var(--c-radius);
-    padding:28px 30px;
     box-shadow:var(--c-shadow);
+    overflow:hidden;
+    container-type:inline-size;
+  }
+  .card-header{
+    background:var(--c-header-bg);
+    padding:26px 30px 18px;
   }
   #card h2{
     text-align:var(--c-heading-align);
-    color:var(--c-heading);
+    color:var(--c-header-fg);
     font-family:var(--c-heading-font);
     font-style:var(--c-heading-style);
-    margin:0 0 2px;
-    font-size:1.4rem;
-    letter-spacing:1px;
+    margin:0 0 4px;
+    font-size:1.45rem;
+    letter-spacing:.8px;
   }
   #card .subtitle{
     text-align:var(--c-heading-align);
-    color:var(--muted);
+    color:var(--c-header-sub);
     font-size:.8rem;
-    margin-bottom:16px;
     text-transform:uppercase;
     letter-spacing:1.5px;
   }
@@ -324,43 +369,58 @@
     gap:18px;
     align-items:flex-start;
     border-bottom:1px solid var(--c-divider);
-    padding-bottom:14px;
-    margin-bottom:14px;
+    padding:18px 30px 16px;
   }
+  .card-top-text{min-width:0;}
   #photoBox{
     width:110px;
     height:135px;
     flex:0 0 auto;
-    border:1px solid var(--border);
-    border-radius:6px;
+    border:2px solid var(--gold);
+    border-radius:10px;
     overflow:hidden;
-    background:#f4ede1;
+    background:var(--gold-soft);
     display:flex;
     align-items:center;
     justify-content:center;
     font-size:.7rem;
     color:var(--muted);
     text-align:center;
+    box-shadow:var(--shadow-sm);
   }
   #photoBox img{width:100%;height:100%;object-fit:cover;}
-  #nameLine{font-size:1.15rem;font-weight:700;color:var(--c-name);}
-  #aboutLine{font-size:.85rem;color:#555;margin-top:6px;line-height:1.4;}
+  #nameLine{font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--c-name);overflow-wrap:anywhere;}
+  #aboutLine{font-size:.85rem;color:#555;margin-top:6px;line-height:1.45;white-space:pre-line;overflow-wrap:anywhere;}
+  .requirements-text{font-size:.85rem;color:var(--ink);line-height:1.5;white-space:pre-line;overflow-wrap:anywhere;}
+  #previewBody{padding:6px 30px 28px;}
   .section-title{
     color:var(--c-accent);
     font-size:.85rem;
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.8px;
-    margin:14px 0 6px;
+    margin:16px 0 8px;
   }
   .kv{
     display:grid;
-    grid-template-columns:130px 1fr;
+    grid-template-columns:1fr;
+    row-gap:8px;
+    column-gap:16px;
     font-size:.85rem;
-    row-gap:4px;
   }
-  .kv .k{color:var(--muted);}
-  .kv .v{font-weight:600;color:var(--ink);overflow-wrap:break-word;}
+  @container (min-width:400px){
+    .kv{grid-template-columns:1fr 1fr;}
+  }
+  .kv-item{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    min-width:0;
+  }
+  .kv-item.kv-wide{grid-column:1 / -1;}
+  .kv .k{color:var(--muted);white-space:nowrap;flex-shrink:0;}
+  .kv .k::after{content:":";}
+  .kv .v{font-weight:600;color:var(--ink);overflow-wrap:break-word;min-width:0;}
   .empty-hint{color:var(--muted);font-size:.8rem;text-align:center;padding:20px 0;}
 
   /* Modern Minimal — shared by #card and #igCard. Selectors list both ids
@@ -370,14 +430,19 @@
     --c-bg:#ffffff;
     --c-border:#eceff2;
     --c-border-width:1px;
-    --c-radius:8px;
-    --c-heading:#1f3a5f;
+    --c-radius:14px;
+    --c-header-bg:transparent;
+    --c-header-fg:#1f3a5f;
+    --c-header-sub:var(--muted);
+    --c-heading-font:var(--font-body);
     --c-heading-align:left;
     --c-name:#1f3a5f;
     --c-accent:#1f3a5f;
     --c-divider:#e5e9ee;
     --c-shadow:0 1px 3px rgba(0,0,0,.06), 0 10px 24px rgba(20,40,60,.06);
   }
+  #card.tpl-modern .card-header{padding:26px 30px 6px;}
+  #card.tpl-modern .subtitle{letter-spacing:1.2px;}
   #card.tpl-modern .section-title{
     border-left:3px solid var(--c-accent);
     padding-left:8px;
@@ -389,14 +454,16 @@
     --c-bg:#fff6f8;
     --c-border:#e7b6c4;
     --c-border-width:1px;
-    --c-radius:16px;
-    --c-heading:#b23a5e;
-    --c-heading-font:Georgia,'Times New Roman',serif;
+    --c-radius:24px;
+    --c-header-bg:linear-gradient(135deg,#c2456a 0%,#8f2c49 100%);
+    --c-header-fg:#ffffff;
+    --c-header-sub:#f6d3dd;
+    --c-heading-font:var(--font-display);
     --c-heading-style:italic;
     --c-name:#b23a5e;
     --c-accent:#b23a5e;
     --c-divider:#f0d3db;
-    --c-shadow:0 4px 20px rgba(178,58,94,.10);
+    --c-shadow:0 10px 30px rgba(178,58,94,.14);
   }
 
   /* Royal Navy & Gold */
@@ -404,21 +471,16 @@
     --c-bg:#ffffff;
     --c-border:#c9a24b;
     --c-border-width:2px;
-    --c-radius:6px;
-    --c-heading:#ffffff;
-    --c-heading-font:Georgia,'Times New Roman',serif;
+    --c-radius:10px;
+    --c-header-bg:#12233f;
+    --c-header-fg:#ffffff;
+    --c-header-sub:var(--gold);
+    --c-heading-font:var(--font-display);
     --c-name:#12233f;
     --c-accent:#8a6a1f;
     --c-divider:#e2e6ec;
-    --c-shadow:0 4px 18px rgba(0,0,0,.08);
+    --c-shadow:0 10px 30px rgba(18,35,63,.14);
   }
-  #card.tpl-royal .card-header{
-    background:#12233f;
-    margin:-28px -30px 16px;
-    padding:22px 30px 16px;
-    border-radius:4px 4px 0 0;
-  }
-  #card.tpl-royal .subtitle{color:#c9a24b;}
 
   .note-checkbox{
     display:flex;
@@ -438,7 +500,6 @@
        (kept in sync with the template picker) re-colors this card too. */
     --c-bg:#fffdf8;
     --c-border:var(--gold);
-    --c-heading:var(--maroon);
     --c-name:var(--maroon-dark);
     --c-accent:var(--maroon);
     --c-divider:var(--border);
@@ -481,7 +542,7 @@
     flex-shrink:0;
   }
   #igPhotoBox img{width:100%;height:100%;object-fit:cover;}
-  #igName{font-size:52px;font-weight:800;color:var(--c-name);margin-bottom:10px;line-height:1.2;}
+  #igName{font-family:var(--font-display);font-size:52px;font-weight:800;color:var(--c-name);margin-bottom:10px;line-height:1.2;}
   #igTagline{font-size:27px;color:#555;margin-bottom:28px;}
   .ig-divider{width:120px;height:3px;background:var(--c-border);margin:0 0 32px;flex-shrink:0;}
   #igDetails{font-size:25px;line-height:2.15;color:var(--ink);}
@@ -500,11 +561,13 @@
 
 <header>
   <div class="lang-picker" id="langPicker">
-    <button type="button" data-lang="en">EN</button>
-    <button type="button" data-lang="te">తె</button>
+    <span class="lang-icon">🌐</span>
+    <select id="langSelect">
+      <option value="en">English</option>
+      <option value="te">తెలుగు</option>
+    </select>
   </div>
   <h1><img src="logo.svg" alt="" class="logo"><span data-i18n="appTitle">Matrimonial Biodata Maker</span></h1>
-  <p data-i18n="appSubtitle">Fill in the details, pick a template, and download your biodata as a PDF or image.</p>
 </header>
 
 <div class="layout">
@@ -803,8 +866,8 @@
             </div>
             <input type="hidden" id="phone">
             <label class="note-checkbox">
-              <input type="checkbox" id="showPhoneInBiodata" checked>
-              <span data-i18n="note.showPhone">Show this number in the biodata preview/PDF/image.</span>
+              <input type="checkbox" id="hide_phone">
+              <span data-i18n="note.dontShow">Don't show in biodata</span>
             </label>
           </div>
           <div>
@@ -830,8 +893,8 @@
             </div>
             <input type="hidden" id="father_phone">
             <label class="note-checkbox">
-              <input type="checkbox" id="showFatherPhoneInBiodata" checked>
-              <span data-i18n="note.showPhone">Show this number in the biodata preview/PDF/image.</span>
+              <input type="checkbox" id="hide_father_phone">
+              <span data-i18n="note.dontShow">Don't show in biodata</span>
             </label>
           </div>
           <div>
@@ -853,8 +916,8 @@
             </div>
             <input type="hidden" id="mother_phone">
             <label class="note-checkbox">
-              <input type="checkbox" id="showMotherPhoneInBiodata" checked>
-              <span data-i18n="note.showPhone">Show this number in the biodata preview/PDF/image.</span>
+              <input type="checkbox" id="hide_mother_phone">
+              <span data-i18n="note.dontShow">Don't show in biodata</span>
             </label>
           </div>
         </div>
@@ -871,15 +934,24 @@
         </label>
         <div class="photo-note" data-i18n="photoNote">* Only JPG, JPEG and PNG formats are accepted.</div>
         <label data-i18n="formLabel.about_me">About Me</label>
-        <textarea id="about_me" placeholder="A few lines about yourself, hobbies, values, your conditions, requirements..." data-i18n-ph="ph.about_me"></textarea>
+        <textarea id="about_me" maxlength="300" placeholder="A few lines about yourself, hobbies, values, your conditions, requirements..." data-i18n-ph="ph.about_me"></textarea>
+        <div class="char-count"><span id="aboutMeCount">0</span>/300</div>
+
+        <label data-i18n="formLabel.requirements">Partner Requirements</label>
+        <textarea id="requirements" maxlength="300" placeholder="What you're looking for in a life partner..." data-i18n-ph="ph.requirements"></textarea>
+        <div class="field-meta-row">
+          <label class="note-checkbox">
+            <input type="checkbox" id="hide_requirements">
+            <span data-i18n="note.dontShow">Don't show in biodata</span>
+          </label>
+          <div class="char-count"><span id="requirementsCount">0</span>/300</div>
+        </div>
       </fieldset>
 
       <div class="actions">
         <div class="btn-row">
           <button type="button" id="pdfBtn" data-i18n="btn.pdf">Download as PDF</button>
           <button type="button" id="imageBtn" class="secondary" data-i18n="btn.image">Download as Image</button>
-        </div>
-        <div class="btn-row" style="margin-top:10px;">
           <button type="button" id="igBtn" class="secondary" data-i18n="btn.ig">📱 Instagram Style Template</button>
         </div>
         <label class="note-checkbox">
@@ -908,7 +980,7 @@
 
       <div class="card-top">
         <div id="photoBox" data-i18n="noPhoto">No Photo</div>
-        <div>
+        <div class="card-top-text">
           <div id="nameLine" data-i18n="yourName">Your Name</div>
           <div id="aboutLine"></div>
         </div>
@@ -954,8 +1026,31 @@ const FIELDS = [
   "gothra","mama_gotram","manglik","rashi","nakshatra",
   "education","college_name","work_sector","occupation","company_name","annual_income",
   "father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation",
-  "current_address","phone","father_phone","mother_phone","email","about_me"
+  "current_address","phone","father_phone","mother_phone","email","about_me","requirements"
 ];
+
+// A field can be hidden from the preview/PDF/image via a checkbox named
+// hide_<fieldId> (checked = hidden, unchecked/default = shown). Phone and
+// requirements already have one in the HTML; the rest below get theirs
+// injected right after their input so the checkbox sits next to the field
+// without repeating the same markup 17 times.
+function isFieldHidden(fieldId){
+  const cb = document.getElementById("hide_" + fieldId);
+  return !!(cb && cb.checked);
+}
+const HIDEABLE_FIELDS = [
+  "gender","mother_tongue","caste","category","diet","complexion",
+  "gothra","mama_gotram","manglik","rashi","nakshatra",
+  "father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation"
+];
+HIDEABLE_FIELDS.forEach(id => {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const wrap = document.createElement("label");
+  wrap.className = "note-checkbox";
+  wrap.innerHTML = `<input type="checkbox" id="hide_${id}"><span data-i18n="note.dontShow">Don't show in biodata</span>`;
+  el.insertAdjacentElement("afterend", wrap);
+});
 
 /* ============================================================
    I18N — English/Telugu. Every static UI string, dropdown option
@@ -987,7 +1082,7 @@ const I18N = {
       father_name:"Father's Name", father_occupation:"Father's Occupation", mother_name:"Mother's Name",
       mother_occupation:"Mother's Occupation", siblings:"Siblings", siblings_occupation:"Siblings' Occupation",
       contact_no:"Contact No", email:"Email ID", father_contact_no:"Father's Contact No.", mother_contact_no:"Mother's Contact No.",
-      address:"Address", about_me:"About Me"
+      address:"Address", about_me:"About Me", requirements:"Partner Requirements"
     },
     previewLabel: {
       first_name:"First Name", last_name:"Last Name", gender:"Gender", dob:"Date of Birth", height:"Height",
@@ -1017,10 +1112,11 @@ const I18N = {
       phone_number_short:"10-digit mobile",
       email:"your@email.com",
       address:"Full residential address",
-      about_me:"A few lines about yourself, hobbies, values, your conditions, requirements..."
+      about_me:"A few lines about yourself, hobbies, values, your conditions, requirements...",
+      requirements:"What you're looking for in a life partner..."
     },
     note: {
-      showPhone:"Show this number in the biodata preview/PDF/image.",
+      dontShow:"Don't show in biodata",
       igPhone:"Include phone number in the Instagram image."
     },
     btn: { pdf:"Download as PDF", image:"Download as Image", ig:"📱 Instagram Style Template" },
@@ -1033,18 +1129,14 @@ const I18N = {
     noPhoto:"No Photo",
     ageYears:"yrs",
     emptyHint:"Fill the form to see your biodata preview here.",
-    groupTitle: { personal:"Personal", astro:"Astro Details", education:"Education & Career", family:"Family", contact:"Contact" },
+    groupTitle: { personal:"👤 Personal Details", astro:"✨ Astro Details", education:"🎓 Education & Career", family:"👪 Family Details", contact:"📞 Contact" },
+    requirementsTitle:"💍 Requirements",
     igEyebrow:"Matrimonial Profile",
     msg: {
       requiredFields:"Please fill in all required fields (marked with *).",
-      savedGenerating:l => `Saved. Generating your ${l}...`,
-      saveFailed:l => `Could not save to database, but your ${l} will still be generated.`,
-      dbNotConfigured:"Database not configured yet — skipping save.",
-      savedAndDownloaded:l => `Saved and ${l} downloaded!`,
-      generationError:l => `Something went wrong generating the ${l}.`,
+      downloaded:l => `${l} downloaded!`,
+      downloadFailed:l => `Could not download the ${l}. Please try again.`,
       onlyJpgPng:"Only JPG, JPEG and PNG photos are accepted.",
-      igDownloaded:"Instagram image downloaded!",
-      igError:"Something went wrong generating the Instagram image.",
       working:"Working..."
     },
     labelWord: { pdf:"PDF", image:"image", igImage:"Instagram image" },
@@ -1083,7 +1175,7 @@ const I18N = {
       father_name:"తండ్రి పేరు", father_occupation:"తండ్రి వృత్తి", mother_name:"తల్లి పేరు",
       mother_occupation:"తల్లి వృత్తి", siblings:"తోబుట్టువులు", siblings_occupation:"తోబుట్టువుల వృత్తి",
       contact_no:"సంప్రదింపు నంబర్", email:"ఇమెయిల్ ఐడి", father_contact_no:"తండ్రి సంప్రదింపు నంబర్", mother_contact_no:"తల్లి సంప్రదింపు నంబర్",
-      address:"చిరునామా", about_me:"నా గురించి"
+      address:"చిరునామా", about_me:"నా గురించి", requirements:"భాగస్వామి అంచనాలు"
     },
     previewLabel: {
       first_name:"మొదటి పేరు", last_name:"ఇంటిపేరు", gender:"లింగం", dob:"పుట్టిన తేదీ", height:"ఎత్తు",
@@ -1113,10 +1205,11 @@ const I18N = {
       phone_number_short:"10 అంకెల మొబైల్",
       email:"your@email.com",
       address:"పూర్తి నివాస చిరునామా",
-      about_me:"మీ గురించి, అభిరుచులు, విలువలు, మీ షరతులు, అవసరాల గురించి కొన్ని పంక్తులు..."
+      about_me:"మీ గురించి, అభిరుచులు, విలువలు, మీ షరతులు, అవసరాల గురించి కొన్ని పంక్తులు...",
+      requirements:"జీవిత భాగస్వామిలో మీరు ఏమి కోరుకుంటున్నారు..."
     },
     note: {
-      showPhone:"ఈ నంబర్‌ను బయోడేటా ప్రివ్యూ/PDF/చిత్రంలో చూపించు.",
+      dontShow:"బయోడేటాలో చూపించవద్దు",
       igPhone:"ఇన్‌స్టాగ్రామ్ చిత్రంలో ఫోన్ నంబర్‌ను చేర్చు."
     },
     btn: { pdf:"PDFగా డౌన్‌లోడ్ చేయండి", image:"చిత్రంగా డౌన్‌లోడ్ చేయండి", ig:"📱 ఇన్‌స్టాగ్రామ్ స్టైల్ టెంప్లేట్" },
@@ -1129,18 +1222,14 @@ const I18N = {
     noPhoto:"ఫోటో లేదు",
     ageYears:"సం.",
     emptyHint:"మీ బయోడేటా ప్రివ్యూ ఇక్కడ చూడటానికి ఫారమ్‌ను నింపండి.",
-    groupTitle: { personal:"వ్యక్తిగతం", astro:"జాతక వివరాలు", education:"విద్య & ఉద్యోగం", family:"కుటుంబం", contact:"సంప్రదింపు" },
+    groupTitle: { personal:"👤 వ్యక్తిగతం", astro:"✨ జాతక వివరాలు", education:"🎓 విద్య & ఉద్యోగం", family:"👪 కుటుంబం", contact:"📞 సంప్రదింపు" },
+    requirementsTitle:"💍 అంచనాలు",
     igEyebrow:"వైవాహిక ప్రొఫైల్",
     msg: {
       requiredFields:"దయచేసి అన్ని అవసరమైన ఫీల్డ్‌లను (* గుర్తుతో ఉన్నవి) నింపండి.",
-      savedGenerating:l => `సేవ్ చేయబడింది. మీ ${l} తయారవుతోంది...`,
-      saveFailed:l => `డేటాబేస్‌కు సేవ్ చేయలేకపోయాము, కానీ మీ ${l} ఇప్పటికీ తయారవుతుంది.`,
-      dbNotConfigured:"డేటాబేస్ ఇంకా కాన్ఫిగర్ చేయబడలేదు — సేవ్ చేయడం దాటవేయబడుతోంది.",
-      savedAndDownloaded:l => `సేవ్ చేయబడింది మరియు ${l} డౌన్‌లోడ్ అయ్యింది!`,
-      generationError:l => `${l} తయారు చేయడంలో ఏదో తప్పు జరిగింది.`,
+      downloaded:l => `${l} డౌన్‌లోడ్ అయ్యింది!`,
+      downloadFailed:l => `${l} డౌన్‌లోడ్ చేయడం సాధ్యం కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.`,
       onlyJpgPng:"JPG, JPEG మరియు PNG ఫోటోలు మాత్రమే ఆమోదించబడతాయి.",
-      igDownloaded:"ఇన్‌స్టాగ్రామ్ చిత్రం డౌన్‌లోడ్ అయ్యింది!",
-      igError:"ఇన్‌స్టాగ్రామ్ చిత్రం తయారు చేయడంలో ఏదో తప్పు జరిగింది.",
       working:"పని జరుగుతోంది..."
     },
     labelWord: { pdf:"PDF", image:"చిత్రం", igImage:"ఇన్‌స్టాగ్రామ్ చిత్రం" },
@@ -1217,18 +1306,26 @@ function applyLanguage(lang){
   currentLang = I18N.hasOwnProperty(lang) ? lang : "en";
   try{ localStorage.setItem("biodata_lang", currentLang); }catch(e){}
   document.documentElement.lang = currentLang;
-  document.querySelectorAll("#langPicker button").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.lang === currentLang);
-  });
+  document.getElementById("langSelect").value = currentLang;
   applyStaticTranslations();
   applyOptionTranslations();
   setTemplate(currentTemplate);
   renderPreview();
 }
 
-document.querySelectorAll("#langPicker button").forEach(btn => {
-  btn.addEventListener("click", () => applyLanguage(btn.dataset.lang));
-});
+document.getElementById("langSelect").addEventListener("change", e => applyLanguage(e.target.value));
+
+// Gives the preview card an A4-page look (width:height ~ 210:297) by setting
+// a *minimum* height from its current width — never a fixed/max height, so
+// longer biodata content (more fields, a long About Me) still grows the card
+// instead of being clipped, on-screen and in the captured PDF/image alike.
+const cardEl = document.getElementById("card");
+function syncCardA4MinHeight(){
+  const w = cardEl.getBoundingClientRect().width;
+  if(w > 0) cardEl.style.minHeight = (w * 297 / 210) + "px";
+}
+new ResizeObserver(syncCardA4MinHeight).observe(cardEl);
+syncCardA4MinHeight();
 
 let currentTemplate = "classic";
 
@@ -1283,6 +1380,21 @@ document.getElementById("photo").addEventListener("change", e => {
   reader.readAsDataURL(file);
 });
 
+const TEXTAREA_MAX_LEN = 300;
+function wireCharCount(textareaId, counterId){
+  const el = document.getElementById(textareaId);
+  const countEl = document.getElementById(counterId);
+  const sync = () => {
+    const len = el.value.length;
+    countEl.textContent = len;
+    countEl.parentElement.classList.toggle("char-count-limit", len >= TEXTAREA_MAX_LEN);
+  };
+  el.addEventListener("input", sync);
+  sync();
+}
+wireCharCount("about_me", "aboutMeCount");
+wireCharCount("requirements", "requirementsCount");
+
 // Each phone number is a country-code dropdown + a number field, combined
 // into one hidden field so the rest of the app (record building, preview,
 // PDF/image rendering) can keep treating it as a single value.
@@ -1306,37 +1418,55 @@ function renderPreview(){
   document.getElementById("nameLine").textContent = name || t().yourName;
   document.getElementById("aboutLine").textContent = document.getElementById("about_me").value.trim();
 
+  // pairMode controls how a group's fields share a row in the preview:
+  // "dynamic" pairs two fields per row unless their label+value run long,
+  // "fixed" always pairs fields two-at-a-time in the given order (used for
+  // astro, where mama_gotram is forced alone on its own trailing row), and
+  // "single" always gives each field its own row.
   const groups = [
-    {title:t().groupTitle.personal, fields:["gender","dob","height","marital_status","religion","mother_tongue","caste","category","diet","complexion","living_country","living_state","living_city"]},
-    {title:t().groupTitle.astro, fields:["gothra","mama_gotram","manglik","rashi","nakshatra"]},
-    {title:t().groupTitle.education, fields:["education","college_name","work_sector","occupation","company_name","annual_income"]},
-    {title:t().groupTitle.family, fields:["father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation"]},
-    {title:t().groupTitle.contact, fields:["current_address","phone","father_phone","mother_phone","email"]}
+    {title:t().groupTitle.personal, fields:["gender","dob","height","marital_status","religion","mother_tongue","caste","category","diet","complexion","living_country","living_state","living_city"], pairMode:"dynamic"},
+    {title:t().groupTitle.astro, fields:["gothra","nakshatra","rashi","manglik","mama_gotram"], pairMode:"fixed", alwaysAlone:["mama_gotram"]},
+    {title:t().groupTitle.education, fields:["education","college_name","work_sector","occupation","company_name","annual_income"], pairMode:"single"},
+    {title:t().groupTitle.family, fields:["father_name","father_occupation","mother_name","mother_occupation","siblings","siblings_occupation"], pairMode:"single"},
+    {title:t().groupTitle.contact, fields:["current_address","phone","father_phone","mother_phone","email"], pairMode:"single"}
   ];
-
-  const phoneVisibilityCheckbox = {
-    phone: "showPhoneInBiodata",
-    father_phone: "showFatherPhoneInBiodata",
-    mother_phone: "showMotherPhoneInBiodata"
-  };
 
   let html = "";
   let hasAny = false;
   for(const g of groups){
     const rows = g.fields
       .map(f => {
-        const checkboxId = phoneVisibilityCheckbox[f];
-        if(checkboxId && !document.getElementById(checkboxId).checked) return "";
+        if(isFieldHidden(f)) return "";
         let v = document.getElementById(f).value.trim();
         if(!v) return "";
         v = f === "dob" ? fmtDate(v) : displayValue(f, v);
         hasAny = true;
-        return `<div class="k">${label(f)}</div><div class="v">${escapeHtml(v)}</div>`;
+        const l = label(f);
+        let wide;
+        if(g.alwaysAlone && g.alwaysAlone.includes(f)){
+          wide = true;
+        } else if(g.pairMode === "single"){
+          wide = true;
+        } else if(g.pairMode === "fixed"){
+          wide = false;
+        } else {
+          // "dynamic": fields whose label+value run long (an address, a job
+          // title, a parenthetical note, ...) get a full row to themselves
+          // instead of being squeezed into half a row alongside another field.
+          wide = (l.length + v.length) > 28;
+        }
+        return `<div class="kv-item${wide ? " kv-wide" : ""}"><span class="k">${l}</span><span class="v">${escapeHtml(v)}</span></div>`;
       })
       .join("");
     if(rows){
       html += `<div class="section-title">${g.title}</div><div class="kv">${rows}</div>`;
     }
+  }
+
+  const requirementsVal = document.getElementById("requirements").value.trim();
+  if(requirementsVal && !isFieldHidden("requirements")){
+    hasAny = true;
+    html += `<div class="section-title">${t().requirementsTitle}</div><div class="requirements-text">${escapeHtml(requirementsVal)}</div>`;
   }
 
   document.getElementById("previewBody").innerHTML = hasAny
@@ -1493,26 +1623,22 @@ async function handleDownload(btn, btnLabelKey, generator){
     // Rendered once here and reused below so we don't pay for html2canvas twice.
     const cardCanvas = await renderCardCanvas();
 
+    // Saving a copy to the database is a best-effort background action —
+    // its outcome is an internal implementation detail, not something to
+    // surface to the user, so failures here are only ever logged.
     if(supabaseClient && !savedToDb){
       try{
         await saveToDbIfNeeded(cardCanvas);
-        showStatus("ok", t().msg.savedGenerating(savedLabel));
       }catch(err){
-        console.error(err);
-        showStatus("err", t().msg.saveFailed(savedLabel));
+        console.error("Database save failed:", err);
       }
-    } else if(!supabaseClient){
-      showStatus("warn", t().msg.dbNotConfigured);
     }
 
     await generator(cardCanvas);
-
-    if(supabaseClient && savedToDb){
-      showStatus("ok", t().msg.savedAndDownloaded(savedLabel));
-    }
+    showStatus("ok", t().msg.downloaded(savedLabel));
   }catch(err){
     console.error(err);
-    showStatus("err", t().msg.generationError(savedLabel));
+    showStatus("err", t().msg.downloadFailed(savedLabel));
   }finally{
     btn.disabled = false;
     btn.textContent = defaultLabel;
@@ -1604,14 +1730,15 @@ document.getElementById("igBtn").addEventListener("click", async () => {
   if(!validate()) return;
   const btn = document.getElementById("igBtn");
   const defaultLabel = t().btn.ig;
+  const savedLabel = t().labelWord.igImage;
   btn.disabled = true;
   btn.textContent = t().msg.working;
   try{
     await generateInstagramImage();
-    showStatus("ok", t().msg.igDownloaded);
+    showStatus("ok", t().msg.downloaded(savedLabel));
   }catch(err){
     console.error(err);
-    showStatus("err", t().msg.igError);
+    showStatus("err", t().msg.downloadFailed(savedLabel));
   }finally{
     btn.disabled = false;
     btn.textContent = defaultLabel;
