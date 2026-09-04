@@ -1545,7 +1545,16 @@ function fileNameBase(){
 
 async function renderCardCanvas(){
   const card = document.getElementById("card");
-  return await html2canvas(card, {scale:2, backgroundColor:"#ffffff"});
+  // Capture as if on a spacious desktop screen, regardless of the actual
+  // device: the live on-screen preview intentionally collapses to a
+  // single narrow column on mobile (any wider and short field pairs like
+  // "Never Married"/"Telangana" wrap into an unreadable mess), but a
+  // downloaded PDF/image shouldn't be held hostage to whatever screen
+  // the viewer happened to fill the form in on. windowWidth re-lays-out
+  // the cloned document at this width, which pushes both the two-column
+  // page layout and the card's own field-pairing container query into
+  // their "wide" states before the capture happens.
+  return await html2canvas(card, {scale:2, backgroundColor:"#ffffff", windowWidth:1200, windowHeight:1600});
 }
 
 async function generatePdf(canvas){
