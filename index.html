@@ -801,13 +801,19 @@
             <label class="req" data-i18n="formLabel.annual_income">Annual Income</label>
             <select id="annual_income" required data-i18n-options="annual_income">
               <option value="" data-i18n="selectPlaceholder">Select</option>
+              <option value="No Income">No Income</option>
               <option value="Below ₹2 Lakhs">Below ₹2 Lakhs</option>
               <option value="₹2 - 5 Lakhs">₹2 - 5 Lakhs</option>
               <option value="₹5 - 10 Lakhs">₹5 - 10 Lakhs</option>
               <option value="₹10 - 15 Lakhs">₹10 - 15 Lakhs</option>
-              <option value="₹15 - 25 Lakhs">₹15 - 25 Lakhs</option>
-              <option value="₹25 - 50 Lakhs">₹25 - 50 Lakhs</option>
-              <option value="₹50 Lakhs+">₹50 Lakhs+</option>
+              <option value="₹15 - 20 Lakhs">₹15 - 20 Lakhs</option>
+              <option value="₹20 - 25 Lakhs">₹20 - 25 Lakhs</option>
+              <option value="₹25 - 30 Lakhs">₹25 - 30 Lakhs</option>
+              <option value="₹30 - 50 Lakhs">₹30 - 50 Lakhs</option>
+              <option value="₹50 - 70 Lakhs">₹50 - 70 Lakhs</option>
+              <option value="₹70 - 90 Lakhs">₹70 - 90 Lakhs</option>
+              <option value="₹90 Lakhs - ₹1 Crore">₹90 Lakhs - ₹1 Crore</option>
+              <option value="₹1 Crore+">₹1 Crore+</option>
               <option value="Prefer not to say">Prefer not to say</option>
             </select>
           </div>
@@ -1151,7 +1157,7 @@ const I18N = {
       manglik: {Yes:"Yes", No:"No", "Don't know":"Don't know"},
       education: {"High School":"High School", Diploma:"Diploma", "Bachelor's Degree":"Bachelor's Degree", "Master's Degree":"Master's Degree", "Doctorate (PhD)":"Doctorate (PhD)", "Professional Degree":"Professional Degree", Other:"Other"},
       work_sector: {"Government / PSU":"Government / PSU", "Private Sector":"Private Sector", "Business / Self-Employed":"Business / Self-Employed", Defence:"Defence", "Not Working":"Not Working", Other:"Other"},
-      annual_income: {"Below ₹2 Lakhs":"Below ₹2 Lakhs", "₹2 - 5 Lakhs":"₹2 - 5 Lakhs", "₹5 - 10 Lakhs":"₹5 - 10 Lakhs", "₹10 - 15 Lakhs":"₹10 - 15 Lakhs", "₹15 - 25 Lakhs":"₹15 - 25 Lakhs", "₹25 - 50 Lakhs":"₹25 - 50 Lakhs", "₹50 Lakhs+":"₹50 Lakhs+", "Prefer not to say":"Prefer not to say"}
+      annual_income: {"No Income":"No Income", "Below ₹2 Lakhs":"Below ₹2 Lakhs", "₹2 - 5 Lakhs":"₹2 - 5 Lakhs", "₹5 - 10 Lakhs":"₹5 - 10 Lakhs", "₹10 - 15 Lakhs":"₹10 - 15 Lakhs", "₹15 - 20 Lakhs":"₹15 - 20 Lakhs", "₹20 - 25 Lakhs":"₹20 - 25 Lakhs", "₹25 - 30 Lakhs":"₹25 - 30 Lakhs", "₹30 - 50 Lakhs":"₹30 - 50 Lakhs", "₹50 - 70 Lakhs":"₹50 - 70 Lakhs", "₹70 - 90 Lakhs":"₹70 - 90 Lakhs", "₹90 Lakhs - ₹1 Crore":"₹90 Lakhs - ₹1 Crore", "₹1 Crore+":"₹1 Crore+", "Prefer not to say":"Prefer not to say"}
     }
   },
   te: {
@@ -1244,7 +1250,7 @@ const I18N = {
       manglik: {Yes:"అవును", No:"కాదు", "Don't know":"తెలియదు"},
       education: {"High School":"హైస్కూల్", Diploma:"డిప్లొమా", "Bachelor's Degree":"బ్యాచిలర్ డిగ్రీ", "Master's Degree":"మాస్టర్స్ డిగ్రీ", "Doctorate (PhD)":"డాక్టరేట్ (PhD)", "Professional Degree":"ప్రొఫెషనల్ డిగ్రీ", Other:"ఇతర"},
       work_sector: {"Government / PSU":"ప్రభుత్వం / PSU", "Private Sector":"ప్రైవేట్ రంగం", "Business / Self-Employed":"వ్యాపారం / స్వయం ఉపాధి", Defence:"రక్షణ రంగం", "Not Working":"ఉద్యోగం లేదు", Other:"ఇతర"},
-      annual_income: {"Below ₹2 Lakhs":"₹2 లక్షల లోపు", "₹2 - 5 Lakhs":"₹2 - 5 లక్షలు", "₹5 - 10 Lakhs":"₹5 - 10 లక్షలు", "₹10 - 15 Lakhs":"₹10 - 15 లక్షలు", "₹15 - 25 Lakhs":"₹15 - 25 లక్షలు", "₹25 - 50 Lakhs":"₹25 - 50 లక్షలు", "₹50 Lakhs+":"₹50 లక్షలు+", "Prefer not to say":"చెప్పకూడదు అనుకుంటున్నాను"}
+      annual_income: {"No Income":"ఆదాయం లేదు", "Below ₹2 Lakhs":"₹2 లక్షల లోపు", "₹2 - 5 Lakhs":"₹2 - 5 లక్షలు", "₹5 - 10 Lakhs":"₹5 - 10 లక్షలు", "₹10 - 15 Lakhs":"₹10 - 15 లక్షలు", "₹15 - 20 Lakhs":"₹15 - 20 లక్షలు", "₹20 - 25 Lakhs":"₹20 - 25 లక్షలు", "₹25 - 30 Lakhs":"₹25 - 30 లక్షలు", "₹30 - 50 Lakhs":"₹30 - 50 లక్షలు", "₹50 - 70 Lakhs":"₹50 - 70 లక్షలు", "₹70 - 90 Lakhs":"₹70 - 90 లక్షలు", "₹90 Lakhs - ₹1 Crore":"₹90 లక్షలు - ₹1 కోటి", "₹1 Crore+":"₹1 కోటి+", "Prefer not to say":"చెప్పకూడదు అనుకుంటున్నాను"}
     }
   }
 };
