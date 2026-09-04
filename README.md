@@ -6,14 +6,15 @@ Live at [matrimony-biodata-maker.com](https://matrimony-biodata-maker.com) (see 
 
 ## Features
 
-- Multi-section form (personal, astrological, education/career, family, and contact details) with a live-updating preview card
+- Multi-section form (personal, astrological, education/career, family, and contact details) with a live-updating, A4-shaped preview card that grows for longer content instead of clipping it
 - Four visual templates (Classic, Modern, Elegant, Royal) switchable without losing form data
 - Export as PDF (`jsPDF`) or PNG image (`html2canvas`), sized to fit a single A4 page
 - A separate 1080×1350 Instagram-post export with its own layout, generated off-screen from the same data
 - Bilingual UI (English / Telugu) with a language switcher — dropdown values are stored in canonical English internally regardless of the display language, so saved data stays consistent
-- Per-field checkboxes to include/exclude phone numbers (own, father's, mother's) from the rendered biodata and Instagram image
+- Per-field "don't show in biodata" checkboxes (most personal/astro/family fields, all three phone numbers, and the Requirements section) to leave specific details out of the rendered biodata and Instagram image
+- About Me and Partner Requirements free-text sections, each with a live 300-character counter and its own preview section
 - Client-side photo compression (resized and re-encoded to JPEG before upload) to keep Supabase storage usage low
-- Optional persistence to Supabase: form data, uploaded photo, and the rendered card image
+- Optional persistence to Supabase: form data, uploaded photo, and the rendered card image — save failures are only logged to the console and never shown to the user, since the download itself doesn't depend on it
 
 ## Prerequisites
 
@@ -38,7 +39,7 @@ Saving submissions to a database is optional; the form, preview, and all three d
 1. Create a Supabase project and run `supabase_setup.sql` against it (SQL Editor in the Supabase dashboard). This creates the `public.biodata_submissions` table, enables row-level security with an insert-only policy for the `anon` role, and creates two public storage buckets (`biodata-photos` for uploaded photos, `biodata-cards` for the rendered biodata card image) with insert-only policies — there is deliberately no `SELECT` policy, since the buckets are public and files are only ever fetched by their direct public URL, not listed. You view submitted data and photos from the Supabase dashboard (Table Editor / Storage), which uses your own login rather than the public key below.
 2. In `index.html`, set the `SUPABASE_URL` and `SUPABASE_ANON_KEY` constants near the top of the `<script>` block to your project's API URL and anon/publishable key (Project Settings → API in the Supabase dashboard). If left unset, the app silently skips the save step and only performs the download.
 
-The SQL file's final section is a migration block for bringing an already-live table up to date with fields added later (e.g. `first_name`/`last_name` split, `diet`, `living_country`); it's idempotent (`add column if not exists`) and safe to run on a fresh database too.
+The SQL file's later sections are a migration block for bringing an already-live table up to date with fields added later (e.g. `first_name`/`last_name` split, `requirements`) and a cleanup block that drops columns the form no longer writes to (e.g. `time_of_birth`, `full_name`). Both use `if not exists`/`if exists` guards, so they're idempotent and safe to run on a fresh database too — though as with any `drop column`, back up first if you're not sure a column is actually empty.
 
 ## Running the project
 
