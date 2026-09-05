@@ -1144,7 +1144,7 @@ const I18N = {
       downloadFailed:l => `Could not download the ${l}. Please try again.`,
       onlyJpgPng:"Only JPG, JPEG and PNG photos are accepted.",
       working:"Working...",
-      inAppBrowserWarning:"Downloads often fail to save inside Instagram's built-in browser. If the download doesn't work, tap ⋯ or the browser icon and choose \"Open in Chrome/Safari\", then try again there."
+      inAppBrowserWarning:"Downloads often fail to save inside Instagram's built-in browser. Tapping a download button will try to open your phone's Share sheet instead — choose \"Save Image\" or \"Save to Files\" there. If nothing opens, tap ⋯ or the browser icon and choose \"Open in Chrome/Safari\", then try again there."
     },
     labelWord: { pdf:"PDF", image:"image", igImage:"Instagram image" },
     options: {
@@ -1238,7 +1238,7 @@ const I18N = {
       downloadFailed:l => `${l} డౌన్‌లోడ్ చేయడం సాధ్యం కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.`,
       onlyJpgPng:"JPG, JPEG మరియు PNG ఫోటోలు మాత్రమే ఆమోదించబడతాయి.",
       working:"పని జరుగుతోంది...",
-      inAppBrowserWarning:"ఇన్‌స్టాగ్రామ్ బిల్ట్-ఇన్ బ్రౌజర్‌లో డౌన్‌లోడ్‌లు తరచుగా సేవ్ కావు. డౌన్‌లోడ్ పని చేయకపోతే, ⋯ లేదా బ్రౌజర్ ఐకాన్‌ను నొక్కి \"Open in Chrome/Safari\" ఎంచుకుని, అక్కడ మళ్లీ ప్రయత్నించండి."
+      inAppBrowserWarning:"ఇన్‌స్టాగ్రామ్ బిల్ట్-ఇన్ బ్రౌజర్‌లో డౌన్‌లోడ్‌లు తరచుగా సేవ్ కావు. డౌన్‌లోడ్ బటన్ నొక్కితే మీ ఫోన్ షేర్ షీట్ తెరుచుకుంటుంది — అక్కడ \"Save Image\" లేదా \"Save to Files\" ఎంచుకోండి. ఏమీ తెరుచుకోకపోతే, ⋯ లేదా బ్రౌజర్ ఐకాన్‌ను నొక్కి \"Open in Chrome/Safari\" ఎంచుకుని, అక్కడ మళ్లీ ప్రయత్నించండి."
     },
     labelWord: { pdf:"PDF", image:"చిత్రం", igImage:"ఇన్‌స్టాగ్రామ్ చిత్రం" },
     options: {
@@ -1574,13 +1574,30 @@ async function renderCardCanvas(){
   return await html2canvas(card, {scale:2, backgroundColor:"#ffffff", windowWidth:1200, windowHeight:1600});
 }
 
-// Instagram/Facebook/TikTok's in-app WebView browsers frequently refuse to
-// save a plain data: URI (the old approach here) even though the same code
-// works everywhere else — a blob: URL triggered from an <a> that's actually
-// attached to the document is the combination that's compatible with the
-// widest range of in-app browsers. Still, some in-app WebViews block all
-// downloads outright regardless of URL scheme (see isInAppBrowser below).
-function triggerDownload(blob, filename){
+// Instagram/Facebook/TikTok's in-app WebView browsers have no download
+// manager at all in many versions — a <a download> click (even via a real
+// blob: URL attached to the document, not the old data: URI) silently does
+// nothing there, because there's simply nowhere for the browser to put the
+// file. Where available, the Web Share API opens the OS's native share
+// sheet instead ("Save Image" / "Save to Files"), which these in-app
+// WebViews do generally support since it hands the file to the OS rather
+// than to the browser's own (missing) download UI. It's gated to in-app
+// browsers only — everywhere else, the anchor click already works and a
+// share-sheet popup for a routine desktop download would just be noise.
+async function triggerDownload(blob, filename){
+  if(isInAppBrowser() && navigator.canShare){
+    const file = new File([blob], filename, {type: blob.type});
+    if(navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file]});
+        return;
+      }catch(err){
+        if(err && err.name === "AbortError") return; // user dismissed the share sheet — not a failure
+        // Any other failure (unsupported file type, etc.) falls through to the anchor-click attempt below.
+      }
+    }
+  }
+
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -1611,13 +1628,13 @@ async function generatePdf(canvas){
   const y = (pageHeight - imgH) / 2;
 
   pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, imgW, imgH);
-  triggerDownload(pdf.output("blob"), `${fileNameBase()}_biodata.pdf`);
+  await triggerDownload(pdf.output("blob"), `${fileNameBase()}_biodata.pdf`);
 }
 
 async function generateImage(canvas){
   canvas = canvas || await renderCardCanvas();
   const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-  triggerDownload(blob, `${fileNameBase()}_biodata.png`);
+  await triggerDownload(blob, `${fileNameBase()}_biodata.png`);
 }
 
 let savedToDb = false;
@@ -1769,7 +1786,7 @@ async function generateInstagramImage(){
   const card = document.getElementById("igCard");
   const canvas = await html2canvas(card, {scale:1, backgroundColor:"#fff8f0", width:1080, height:1350});
   const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-  triggerDownload(blob, `${fileNameBase()}_instagram.png`);
+  await triggerDownload(blob, `${fileNameBase()}_instagram.png`);
 }
 
 document.getElementById("igBtn").addEventListener("click", async () => {
