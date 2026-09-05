@@ -15,6 +15,7 @@ Live at [matrimony-biodata-maker.com](https://matrimony-biodata-maker.com) (see 
 - About Me and Partner Requirements free-text sections, each with a live 300-character counter and its own preview section
 - Client-side photo compression (resized and re-encoded to JPEG before upload) to keep Supabase storage usage low
 - Optional persistence to Supabase: form data, uploaded photo, and the rendered card image — save failures are only logged to the console and never shown to the user, since the download itself doesn't depend on it
+- Detects in-app browsers (Instagram, Facebook, TikTok, etc.) that block file downloads outright, and shows a banner before the user tries to download — a one-tap "Open in Chrome" escape hatch on Android, or manual "open in Safari" instructions elsewhere, since there's no way to force that redirect on iOS
 
 ## Prerequisites
 
