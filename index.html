@@ -1143,7 +1143,8 @@ const I18N = {
       downloaded:l => `${l} downloaded!`,
       downloadFailed:l => `Could not download the ${l}. Please try again.`,
       onlyJpgPng:"Only JPG, JPEG and PNG photos are accepted.",
-      working:"Working..."
+      working:"Working...",
+      inAppBrowserWarning:"Downloads often fail to save inside Instagram's built-in browser. If the download doesn't work, tap ⋯ or the browser icon and choose \"Open in Chrome/Safari\", then try again there."
     },
     labelWord: { pdf:"PDF", image:"image", igImage:"Instagram image" },
     options: {
@@ -1236,7 +1237,8 @@ const I18N = {
       downloaded:l => `${l} డౌన్‌లోడ్ అయ్యింది!`,
       downloadFailed:l => `${l} డౌన్‌లోడ్ చేయడం సాధ్యం కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.`,
       onlyJpgPng:"JPG, JPEG మరియు PNG ఫోటోలు మాత్రమే ఆమోదించబడతాయి.",
-      working:"పని జరుగుతోంది..."
+      working:"పని జరుగుతోంది...",
+      inAppBrowserWarning:"ఇన్‌స్టాగ్రామ్ బిల్ట్-ఇన్ బ్రౌజర్‌లో డౌన్‌లోడ్‌లు తరచుగా సేవ్ కావు. డౌన్‌లోడ్ పని చేయకపోతే, ⋯ లేదా బ్రౌజర్ ఐకాన్‌ను నొక్కి \"Open in Chrome/Safari\" ఎంచుకుని, అక్కడ మళ్లీ ప్రయత్నించండి."
     },
     labelWord: { pdf:"PDF", image:"చిత్రం", igImage:"ఇన్‌స్టాగ్రామ్ చిత్రం" },
     options: {
@@ -1495,6 +1497,21 @@ function showStatus(kind, msg){
   el.textContent = msg;
 }
 
+// Instagram/Facebook/TikTok/etc. open links in their own in-app WebView
+// rather than the system browser, and several versions of these WebViews
+// silently refuse to save any downloaded file — even a well-formed blob:
+// download that works everywhere else. There's no code-side fix for that;
+// the best we can do is tell people up front so a "nothing happened" click
+// doesn't look like the app is broken.
+function isInAppBrowser(){
+  const ua = navigator.userAgent || "";
+  return /Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|TikTok|BytedanceWebview|musical_ly/i.test(ua);
+}
+
+if(isInAppBrowser()){
+  showStatus("warn", t().msg.inAppBrowserWarning);
+}
+
 // Downscales + re-encodes an uploaded photo client-side (no server needed)
 // so a multi-MB phone photo doesn't eat the free-tier storage quota.
 async function compressImage(file, maxDim = 800, quality = 0.8){
@@ -1557,6 +1574,24 @@ async function renderCardCanvas(){
   return await html2canvas(card, {scale:2, backgroundColor:"#ffffff", windowWidth:1200, windowHeight:1600});
 }
 
+// Instagram/Facebook/TikTok's in-app WebView browsers frequently refuse to
+// save a plain data: URI (the old approach here) even though the same code
+// works everywhere else — a blob: URL triggered from an <a> that's actually
+// attached to the document is the combination that's compatible with the
+// widest range of in-app browsers. Still, some in-app WebViews block all
+// downloads outright regardless of URL scheme (see isInAppBrowser below).
+function triggerDownload(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
 async function generatePdf(canvas){
   canvas = canvas || await renderCardCanvas();
   const { jsPDF } = window.jspdf;
@@ -1576,15 +1611,13 @@ async function generatePdf(canvas){
   const y = (pageHeight - imgH) / 2;
 
   pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, imgW, imgH);
-  pdf.save(`${fileNameBase()}_biodata.pdf`);
+  triggerDownload(pdf.output("blob"), `${fileNameBase()}_biodata.pdf`);
 }
 
 async function generateImage(canvas){
   canvas = canvas || await renderCardCanvas();
-  const link = document.createElement("a");
-  link.download = `${fileNameBase()}_biodata.png`;
-  link.href = canvas.toDataURL("image/png");
-  link.click();
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  triggerDownload(blob, `${fileNameBase()}_biodata.png`);
 }
 
 let savedToDb = false;
@@ -1735,10 +1768,8 @@ async function generateInstagramImage(){
   renderIgCard();
   const card = document.getElementById("igCard");
   const canvas = await html2canvas(card, {scale:1, backgroundColor:"#fff8f0", width:1080, height:1350});
-  const link = document.createElement("a");
-  link.download = `${fileNameBase()}_instagram.png`;
-  link.href = canvas.toDataURL("image/png");
-  link.click();
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  triggerDownload(blob, `${fileNameBase()}_instagram.png`);
 }
 
 document.getElementById("igBtn").addEventListener("click", async () => {
