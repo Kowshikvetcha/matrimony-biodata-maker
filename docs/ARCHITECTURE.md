@@ -23,8 +23,12 @@ flowchart TD
   SaveDb --> UploadCard[uploadCardImage: upload rendered canvas to biodata-cards bucket]
   SaveDb --> InsertRow[(Supabase: biodata_submissions insert)]
   RenderCanvas --> Generator[generatePdf / generateImage / generateInstagramImage]
-  Generator -->|triggers file save| Download[Browser download: PDF / PNG]
+  Generator --> TriggerDownload[triggerDownload: Blob + object URL, clicked via an attached anchor]
+  TriggerDownload -->|browser saves the file| Download[Browser download: PDF / PNG]
   Download --> Status
+
+  PageLoad[page load] --> InAppCheck[isInAppBrowser: UA sniff for Instagram/FB/TikTok/etc.]
+  InAppCheck -->|true| WarnStatus[status banner: in-app-browser download warning]
 ```
 
 A single concrete flow, PDF download, traced through the real code:
@@ -34,10 +38,12 @@ A single concrete flow, PDF download, traced through the real code:
 3. `handleDownload` first calls `validate()` (native HTML5 `checkValidity()` on required fields); if invalid it shows a generic "fill in required fields" status and stops.
 4. It renders the current `#card` DOM node to a canvas once via `renderCardCanvas()` (`html2canvas(card, {scale:2, ...})`), so the same canvas can be reused for both the database save and the actual download.
 5. If a Supabase client was configured, `saveToDbIfNeeded(cardCanvas)` builds a plain object from `FIELDS`, optionally uploads the chosen photo (after client-side compression via `compressImage()`) and the rendered card canvas to Supabase Storage, and inserts one row into `public.biodata_submissions` — guarded by a `savedToDb` flag so a submission is only ever saved once per page load. **Any failure here (network, schema mismatch, etc.) is only `console.error`'d — it never reaches the status banner or blocks the download**, since a database-save outcome is an internal implementation detail, not something the user needs to know about.
-6. `generatePdf(canvas)` runs regardless of whether the save succeeded: it computes a scale that fits the canvas onto a single A4 page in `jsPDF`, centers it, and calls `pdf.save(...)`, which triggers the browser's file download.
+6. `generatePdf(canvas)` runs regardless of whether the save succeeded: it computes a scale that fits the canvas onto a single A4 page in `jsPDF`, centers it, and hands `pdf.output("blob")` to `triggerDownload()`, which builds a `Blob`/`URL.createObjectURL()` and clicks an `<a download>` that's briefly attached to the document before being removed — the actual file save.
 7. `showStatus()` shows one generic status at the end: `"<Label> downloaded!"` on success, or `"Could not download the <label>. Please try again."` if anything in the whole try block threw — the same two messages are reused for PDF, Image, and Instagram downloads (see `I18N.*.msg.downloaded`/`downloadFailed`).
 
-The Image and Instagram-post downloads follow the same `handleDownload` path with a different generator function (`generateImage`, or the separate `igBtn` handler calling `generateInstagramImage`, which re-renders the off-screen `#igCard` element with `renderIgCard()` before capturing it).
+The Image and Instagram-post downloads follow the same `handleDownload` path with a different generator function (`generateImage`, or the separate `igBtn` handler calling `generateInstagramImage`, which re-renders the off-screen `#igCard` element with `renderIgCard()` before capturing it); both also funnel their canvas through `triggerDownload()`.
+
+Separately, at page load `isInAppBrowser()` sniffs `navigator.userAgent` for known in-app WebViews (Instagram, Facebook, TikTok, Line, WeChat) and, if matched, shows a warning status telling the user to open the page in Chrome/Safari — these WebViews are known to silently block file downloads regardless of technique, so this is a heads-up rather than a fix.
 
 ## Directories / files
 
@@ -78,7 +84,7 @@ Since the whole app is one file, this table breaks it down by logical section (i
 | Template picker + `#card` preview | 972–1004 | The 4 template swatches and the live preview card (`#photoBox`, `#nameLine`, `#previewBody`) |
 | `#igCard` markup | 1005–1014 | The off-screen Instagram card's DOM, populated by `renderIgCard()` on demand |
 
-### `<script>` (lines 1015–1755)
+### `<script>` (lines 1015–1795)
 
 | Function / section | Lines (approx.) | Purpose |
 |---|---|---|
@@ -96,15 +102,18 @@ Since the whole app is one file, this table breaks it down by logical section (i
 | `wirePhoneField()` | 1407–1420 | Combines a country-code `<select>` and a number `<input>` into one hidden field (`phone`/`father_phone`/`mother_phone`), used by the record and both card renderers |
 | `renderPreview()` | 1421–1481 | Rebuilds `#previewBody`'s HTML from current form values: groups fields per section with a `pairMode` (dynamic/fixed/single) controlling row-sharing, skips anything `isFieldHidden()`, and appends the Requirements section |
 | `escapeHtml()` | 1483–1488 | HTML-escapes a string for safe interpolation into `innerHTML` |
-| `showStatus()` | 1492–1499 | Sets the `#status` banner's text and ok/err styling |
-| `compressImage()` | 1500–1517 | Client-side resize (max 800px) + re-encode to JPEG (quality 0.8) before any photo is uploaded, to limit Supabase storage usage |
-| `uploadPhoto()`, `uploadCardImage()` | 1518–1538 | Upload the compressed photo / rendered card canvas to the `biodata-photos` / `biodata-cards` Supabase Storage buckets and return their public URLs |
-| `fileNameBase()` | 1540–1544 | Derives the downloaded file's name from the entered first/last name |
-| `renderCardCanvas()`, `generatePdf()`, `generateImage()` | 1546–1582 | `html2canvas`-based capture of `#card`, then either fit-to-A4-page PDF export (`jsPDF`) or direct PNG download |
-| `saveToDbIfNeeded()` | 1583–1607 | Builds the record from `FIELDS`, uploads photo/card image if applicable, inserts into `biodata_submissions`; no-ops if already saved this session or no Supabase client is configured. Called from `handleDownload` inside a try/catch that only logs failures |
-| `validate()`, `handleDownload()` | 1609–1662 | Shared flow for the PDF/Image buttons: validate → render canvas once → save-if-needed (silently) → run the specific generator → show one generic downloaded/download-failed status |
-| `calcAge()`, `val()`, `renderIgCard()`, `generateInstagramImage()` | 1664–1734 | Instagram-specific: computes age from DOB, builds the tagline/detail lines (education, occupation, income, location, religion/caste), and captures `#igCard` at a fixed 1080×1350 size |
-| `igBtn` click handler + initial `applyLanguage(currentLang)` | 1735–1754 | Same validate → canvas → generate → status flow as `handleDownload`, specialized for the Instagram image (no database save); the final line performs the initial render on page load |
+| `showStatus()` | 1494–1498 | Sets the `#status` banner's text and ok/err/warn styling |
+| `isInAppBrowser()` + load-time check | 1500–1513 | Sniffs `navigator.userAgent` for known in-app WebViews (Instagram, Facebook, TikTok, Line, WeChat) and, if matched, immediately shows a warning status — these WebViews are known to silently block downloads no matter how the file is triggered, so there's no code fix, only a heads-up |
+| `compressImage()` | 1517–1534 | Client-side resize (max 800px) + re-encode to JPEG (quality 0.8) before any photo is uploaded, to limit Supabase storage usage |
+| `uploadPhoto()`, `uploadCardImage()` | 1535–1556 | Upload the compressed photo / rendered card canvas to the `biodata-photos` / `biodata-cards` Supabase Storage buckets and return their public URLs |
+| `fileNameBase()` | 1557–1562 | Derives the downloaded file's name from the entered first/last name |
+| `renderCardCanvas()` | 1563–1572 | `html2canvas`-based capture of `#card`, reused by every generator below |
+| `triggerDownload()` | 1574–1593 | Shared save mechanism for all three exports: builds a `Blob`/`URL.createObjectURL()`, clicks a temporarily-attached `<a download>`, then revokes the object URL after a delay. Replaced an earlier `data:` URI + detached-anchor approach that Instagram's in-app browser silently refused to save |
+| `generatePdf()`, `generateImage()` | 1595–1623 | Fit-to-A4-page PDF export (`jsPDF`, output as a blob) or direct PNG — both hand off to `triggerDownload()` |
+| `saveToDbIfNeeded()` | 1625–1649 | Builds the record from `FIELDS`, uploads photo/card image if applicable, inserts into `biodata_submissions`; no-ops if already saved this session or no Supabase client is configured. Called from `handleDownload` inside a try/catch that only logs failures |
+| `validate()`, `handleDownload()` | 1651–1704 | Shared flow for the PDF/Image buttons: validate → render canvas once → save-if-needed (silently) → run the specific generator → show one generic downloaded/download-failed status |
+| `calcAge()`, `val()`, `renderIgCard()`, `generateInstagramImage()` | 1706–1773 | Instagram-specific: computes age from DOB, builds the tagline/detail lines (education, occupation, income, location, religion/caste), and captures `#igCard` at a fixed 1080×1350 size, also handing off to `triggerDownload()` |
+| `igBtn` click handler + initial `applyLanguage(currentLang)` | 1775–1795 | Same validate → canvas → generate → status flow as `handleDownload`, specialized for the Instagram image (no database save); the final line performs the initial render on page load |
 
 ## Key design decisions / gotchas
 
@@ -117,3 +126,4 @@ Since the whole app is one file, this table breaks it down by logical section (i
 - **The Supabase anon key is meant to be public.** It's restricted entirely by the row-level security policies in `supabase_setup.sql` (insert-only, no `SELECT`/`UPDATE`/`DELETE` for the `anon` role) — this is the standard Supabase pattern for a public-facing form, not a leaked secret. Viewing submitted data requires logging into the Supabase dashboard directly.
 - **Storage buckets intentionally have no `SELECT` policy.** The buckets are public, so a known file's direct public URL is already fetchable without RLS; adding a broad `SELECT` policy would instead let anyone *list* every file in the bucket via the Storage API (a warning Supabase's dashboard flags explicitly) — the SQL comments call this out.
 - **`saveToDbIfNeeded` runs at most once per page load** (`savedToDb` flag), so downloading PDF, then Image, then Instagram for the same filled-in form doesn't create duplicate submissions.
+- **Downloads go through `triggerDownload()`'s Blob + attached-anchor pattern, not a bare `data:` URI.** Instagram/Facebook/TikTok's in-app WebViews are known to silently refuse to save a `data:` URI clicked via a detached `<a>` — the file generates fine but nothing ever reaches the device. A real `Blob` object URL clicked via an anchor that's briefly attached to the DOM is compatible with a much wider range of these WebViews. `isInAppBrowser()` additionally warns the user up front when one is detected, since some WebView versions block downloads outright no matter the technique — that part has no code-side fix, only a "open this in Chrome/Safari" nudge.
