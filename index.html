@@ -279,6 +279,30 @@
   .status.warn{display:block;background:#fdf1e0;color:#9a5b00;}
   .status.err{display:block;background:#fbe9e7;color:var(--danger);}
 
+  /* Shown only when the page detects it's running inside an in-app browser
+     (Instagram/Facebook/TikTok/etc.) — these WebViews generally block file
+     downloads entirely, so the only reliable fix is getting the visitor into
+     a real browser, and this needs to be seen before they even try. */
+  #inAppEscapeBanner{
+    display:none;
+    position:sticky; top:0; z-index:100;
+    background:#fdf1e0; color:#9a5b00;
+    padding:10px 16px;
+    font-size:.85rem;
+    text-align:center;
+    border-bottom:1.5px solid var(--gold);
+  }
+  #inAppEscapeBanner.show{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px 10px;}
+  #inAppEscapeBanner a.btn-chrome{
+    display:inline-block;
+    background:var(--maroon); color:#fff;
+    padding:7px 16px;
+    border-radius:var(--radius-pill);
+    text-decoration:none;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
   /* Template picker */
   .template-picker{
     display:flex;
@@ -558,6 +582,11 @@
 </style>
 </head>
 <body>
+
+<div id="inAppEscapeBanner">
+  <span id="inAppEscapeText"></span>
+  <a id="inAppEscapeLink" class="btn-chrome" data-i18n="btn.openInChrome" hidden>Open in Chrome</a>
+</div>
 
 <header>
   <div class="lang-picker" id="langPicker">
@@ -1125,7 +1154,7 @@ const I18N = {
       dontShow:"Don't show in biodata",
       igPhone:"Include phone number in the Instagram image."
     },
-    btn: { pdf:"Download as PDF", image:"Download as Image", ig:"📱 Instagram Style Template" },
+    btn: { pdf:"Download as PDF", image:"Download as Image", ig:"📱 Instagram Style Template", openInChrome:"Open in Chrome" },
     tpLabel:"Template:",
     photoDropLabel:"Click to upload photo",
     photoNote:"* Only JPG, JPEG and PNG formats are accepted.",
@@ -1144,7 +1173,8 @@ const I18N = {
       downloadFailed:l => `Could not download the ${l}. Please try again.`,
       onlyJpgPng:"Only JPG, JPEG and PNG photos are accepted.",
       working:"Working...",
-      inAppBrowserWarning:"Downloads often fail to save inside Instagram's built-in browser. Tapping a download button will try to open your phone's Share sheet instead — choose \"Save Image\" or \"Save to Files\" there. If nothing opens, tap ⋯ or the browser icon and choose \"Open in Chrome/Safari\", then try again there."
+      inAppEscapeAndroid:"You're viewing this inside an app's built-in browser (Instagram, Facebook, etc.), which blocks file downloads. Tap the button to continue in Chrome, where downloads work normally.",
+      inAppEscapeOther:"You're viewing this inside an app's built-in browser (Instagram, Facebook, etc.), which blocks file downloads. Tap ⋯ or the browser icon on this screen and choose \"Open in Safari\" (or your default browser), then continue there."
     },
     labelWord: { pdf:"PDF", image:"image", igImage:"Instagram image" },
     options: {
@@ -1219,7 +1249,7 @@ const I18N = {
       dontShow:"బయోడేటాలో చూపించవద్దు",
       igPhone:"ఇన్‌స్టాగ్రామ్ చిత్రంలో ఫోన్ నంబర్‌ను చేర్చు."
     },
-    btn: { pdf:"PDFగా డౌన్‌లోడ్ చేయండి", image:"చిత్రంగా డౌన్‌లోడ్ చేయండి", ig:"📱 ఇన్‌స్టాగ్రామ్ స్టైల్ టెంప్లేట్" },
+    btn: { pdf:"PDFగా డౌన్‌లోడ్ చేయండి", image:"చిత్రంగా డౌన్‌లోడ్ చేయండి", ig:"📱 ఇన్‌స్టాగ్రామ్ స్టైల్ టెంప్లేట్", openInChrome:"క్రోమ్‌లో తెరవండి" },
     tpLabel:"టెంప్లేట్:",
     photoDropLabel:"ఫోటో అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి",
     photoNote:"* JPG, JPEG మరియు PNG ఫార్మాట్‌లు మాత్రమే ఆమోదించబడతాయి.",
@@ -1238,7 +1268,8 @@ const I18N = {
       downloadFailed:l => `${l} డౌన్‌లోడ్ చేయడం సాధ్యం కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.`,
       onlyJpgPng:"JPG, JPEG మరియు PNG ఫోటోలు మాత్రమే ఆమోదించబడతాయి.",
       working:"పని జరుగుతోంది...",
-      inAppBrowserWarning:"ఇన్‌స్టాగ్రామ్ బిల్ట్-ఇన్ బ్రౌజర్‌లో డౌన్‌లోడ్‌లు తరచుగా సేవ్ కావు. డౌన్‌లోడ్ బటన్ నొక్కితే మీ ఫోన్ షేర్ షీట్ తెరుచుకుంటుంది — అక్కడ \"Save Image\" లేదా \"Save to Files\" ఎంచుకోండి. ఏమీ తెరుచుకోకపోతే, ⋯ లేదా బ్రౌజర్ ఐకాన్‌ను నొక్కి \"Open in Chrome/Safari\" ఎంచుకుని, అక్కడ మళ్లీ ప్రయత్నించండి."
+      inAppEscapeAndroid:"మీరు దీన్ని ఒక యాప్ బిల్ట్-ఇన్ బ్రౌజర్‌లో (ఇన్‌స్టాగ్రామ్, ఫేస్‌బుక్ మొదలైనవి) చూస్తున్నారు, ఇది ఫైల్ డౌన్‌లోడ్‌లను నిరోధిస్తుంది. డౌన్‌లోడ్‌లు సాధారణంగా పనిచేసే క్రోమ్‌లో కొనసాగించడానికి బటన్‌ను నొక్కండి.",
+      inAppEscapeOther:"మీరు దీన్ని ఒక యాప్ బిల్ట్-ఇన్ బ్రౌజర్‌లో (ఇన్‌స్టాగ్రామ్, ఫేస్‌బుక్ మొదలైనవి) చూస్తున్నారు, ఇది ఫైల్ డౌన్‌లోడ్‌లను నిరోధిస్తుంది. ఈ స్క్రీన్‌పై ⋯ లేదా బ్రౌజర్ ఐకాన్‌ను నొక్కి \"Open in Safari\" (లేదా మీ డిఫాల్ట్ బ్రౌజర్) ఎంచుకుని, అక్కడ కొనసాగించండి."
     },
     labelWord: { pdf:"PDF", image:"చిత్రం", igImage:"ఇన్‌స్టాగ్రామ్ చిత్రం" },
     options: {
@@ -1319,6 +1350,7 @@ function applyLanguage(lang){
   applyOptionTranslations();
   setTemplate(currentTemplate);
   renderPreview();
+  updateInAppEscapeBanner();
 }
 
 document.getElementById("langSelect").addEventListener("change", e => applyLanguage(e.target.value));
@@ -1508,9 +1540,43 @@ function isInAppBrowser(){
   return /Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|TikTok|BytedanceWebview|musical_ly/i.test(ua);
 }
 
-if(isInAppBrowser()){
-  showStatus("warn", t().msg.inAppBrowserWarning);
+// On Android, an intent: URL is the one reliable way to escape an in-app
+// WebView entirely — it's a native OS-level scheme, not a normal http(s)
+// link, so it hands navigation to Android's own intent resolver instead of
+// staying inside whatever app currently renders the page (Instagram,
+// Facebook, ...). The browser_fallback_url extra is used if Chrome isn't
+// installed, so this never dead-ends. There's no iOS equivalent: Apple
+// doesn't let a webpage force-launch Safari from inside another app.
+function isAndroidInAppBrowser(){
+  return /Android/i.test(navigator.userAgent || "");
 }
+
+function buildChromeIntentUrl(){
+  const withoutScheme = location.href.replace(/^https?:\/\//, "");
+  const fallback = encodeURIComponent(location.href);
+  return `intent://${withoutScheme}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${fallback};end`;
+}
+
+function updateInAppEscapeBanner(){
+  const banner = document.getElementById("inAppEscapeBanner");
+  const textEl = document.getElementById("inAppEscapeText");
+  const linkEl = document.getElementById("inAppEscapeLink");
+  if(!isInAppBrowser()){
+    banner.classList.remove("show");
+    return;
+  }
+  if(isAndroidInAppBrowser()){
+    textEl.textContent = t().msg.inAppEscapeAndroid;
+    linkEl.href = buildChromeIntentUrl();
+    linkEl.hidden = false;
+  }else{
+    textEl.textContent = t().msg.inAppEscapeOther;
+    linkEl.hidden = true;
+  }
+  banner.classList.add("show");
+}
+
+updateInAppEscapeBanner();
 
 // Downscales + re-encodes an uploaded photo client-side (no server needed)
 // so a multi-MB phone photo doesn't eat the free-tier storage quota.
