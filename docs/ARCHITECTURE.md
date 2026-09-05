@@ -23,12 +23,15 @@ flowchart TD
   SaveDb --> UploadCard[uploadCardImage: upload rendered canvas to biodata-cards bucket]
   SaveDb --> InsertRow[(Supabase: biodata_submissions insert)]
   RenderCanvas --> Generator[generatePdf / generateImage / generateInstagramImage]
-  Generator --> TriggerDownload[triggerDownload: Blob + object URL, clicked via an attached anchor]
-  TriggerDownload -->|browser saves the file| Download[Browser download: PDF / PNG]
-  Download --> Status
+  Generator --> TriggerDownload[triggerDownload]
+  TriggerDownload -->|in-app browser + Web Share supported| ShareSheet[navigator.share: OS share sheet]
+  TriggerDownload -->|otherwise, or share failed/unsupported| AnchorClick[Blob + object URL, clicked via an attached anchor]
+  ShareSheet --> Status
+  AnchorClick --> Status
 
   PageLoad[page load] --> InAppCheck[isInAppBrowser: UA sniff for Instagram/FB/TikTok/etc.]
-  InAppCheck -->|true| WarnStatus[status banner: in-app-browser download warning]
+  InAppCheck -->|true, Android| AndroidBanner[sticky banner: "Open in Chrome" via an intent: URL]
+  InAppCheck -->|true, other OS| OtherBanner[sticky banner: text instructions to open in Safari]
 ```
 
 A single concrete flow, PDF download, traced through the real code:
@@ -38,12 +41,13 @@ A single concrete flow, PDF download, traced through the real code:
 3. `handleDownload` first calls `validate()` (native HTML5 `checkValidity()` on required fields); if invalid it shows a generic "fill in required fields" status and stops.
 4. It renders the current `#card` DOM node to a canvas once via `renderCardCanvas()` (`html2canvas(card, {scale:2, ...})`), so the same canvas can be reused for both the database save and the actual download.
 5. If a Supabase client was configured, `saveToDbIfNeeded(cardCanvas)` builds a plain object from `FIELDS`, optionally uploads the chosen photo (after client-side compression via `compressImage()`) and the rendered card canvas to Supabase Storage, and inserts one row into `public.biodata_submissions` — guarded by a `savedToDb` flag so a submission is only ever saved once per page load. **Any failure here (network, schema mismatch, etc.) is only `console.error`'d — it never reaches the status banner or blocks the download**, since a database-save outcome is an internal implementation detail, not something the user needs to know about.
-6. `generatePdf(canvas)` runs regardless of whether the save succeeded: it computes a scale that fits the canvas onto a single A4 page in `jsPDF`, centers it, and hands `pdf.output("blob")` to `triggerDownload()`, which builds a `Blob`/`URL.createObjectURL()` and clicks an `<a download>` that's briefly attached to the document before being removed — the actual file save.
-7. `showStatus()` shows one generic status at the end: `"<Label> downloaded!"` on success, or `"Could not download the <label>. Please try again."` if anything in the whole try block threw — the same two messages are reused for PDF, Image, and Instagram downloads (see `I18N.*.msg.downloaded`/`downloadFailed`).
+6. `generatePdf(canvas)` runs regardless of whether the save succeeded: it computes a scale that fits the canvas onto a single A4 page in `jsPDF`, centers it, and hands `pdf.output("blob")` to `triggerDownload()`.
+7. `triggerDownload(blob, filename)` is where the actual file save happens, and it branches on whether the page is running inside a known in-app browser. If so, and the platform supports the Web Share API for this file, it calls `navigator.share({files:[file]})` — this opens the OS's native share sheet ("Save Image"/"Save to Files"), which some in-app WebViews honor even though they have no download manager of their own. Otherwise (or if sharing fails for a reason other than the user dismissing the sheet), it falls back to the same `Blob`/`URL.createObjectURL()` + a briefly-attached `<a download>` that already works in normal browsers.
+8. `showStatus()` shows one generic status at the end: `"<Label> downloaded!"` on success, or `"Could not download the <label>. Please try again."` if anything in the whole try block threw — the same two messages are reused for PDF, Image, and Instagram downloads (see `I18N.*.msg.downloaded`/`downloadFailed`).
 
 The Image and Instagram-post downloads follow the same `handleDownload` path with a different generator function (`generateImage`, or the separate `igBtn` handler calling `generateInstagramImage`, which re-renders the off-screen `#igCard` element with `renderIgCard()` before capturing it); both also funnel their canvas through `triggerDownload()`.
 
-Separately, at page load `isInAppBrowser()` sniffs `navigator.userAgent` for known in-app WebViews (Instagram, Facebook, TikTok, Line, WeChat) and, if matched, shows a warning status telling the user to open the page in Chrome/Safari — these WebViews are known to silently block file downloads regardless of technique, so this is a heads-up rather than a fix.
+Separately, at page load (and again on every language switch) `updateInAppEscapeBanner()` calls `isInAppBrowser()` to sniff `navigator.userAgent` for known in-app WebViews (Instagram, Facebook, TikTok, Line, WeChat). If matched, it shows a sticky banner at the very top of the page — before the user has even tried to download anything — with different content per platform: on Android, a real "Open in Chrome" button linking to an `intent:` URL (`buildChromeIntentUrl()`), which hands navigation straight to Android's intent resolver and escapes the in-app WebView entirely, with a `browser_fallback_url` so it never dead-ends if Chrome isn't installed; everywhere else (notably iOS), just text instructions to open the page in Safari, since Apple doesn't let a webpage force that redirect itself. This banner exists because, on a real device, downloads and Web Share both turned out to still fail inside Instagram's Android in-app browser — that WebView blocks file egress outright, and no client-side technique gets around it, so escaping to a real browser is the only fix that actually works.
 
 ## Directories / files
 
@@ -61,59 +65,61 @@ There are no real subdirectories beyond `.git`, `.claude`, and `docs`. Everythin
 
 Since the whole app is one file, this table breaks it down by logical section (in source order) rather than by file.
 
-### `<style>` (lines 15–558)
+### `<style>` (lines 15–582)
 
 | Section | Lines (approx.) | Purpose |
 |---|---|---|
-| `:root` variables, base/body/header | 16–320 | Color palette (maroon/gold on cream), spacing/radius/shadow tokens, the two Google Fonts, the two-column `.layout` grid, header, form panel/fieldset/input/button styling, status banner, character-count and "don't show" checkbox styling |
-| Preview card + `.kv`/`.kv-item` grid | 321–425 | `#card`'s layout, including `container-type: inline-size` so the field grid can respond to the card's own rendered width (not the viewport) via `@container`, and the `.kv-wide` class that forces a field onto its own row |
-| The 4 templates | 426–494 | `tpl-classic`/`tpl-modern`/`tpl-elegant`/`tpl-royal` are CSS custom-property overrides on `#card`/`#igCard` (`--c-bg`, `--c-heading`, `--c-accent`, etc.), not separate markup |
-| `#igCard` | 495–557 | Fixed 1080×1350px off-screen (`left:-9999px`) card used only as an `html2canvas` capture source for the Instagram export; reuses the same CSS variables as the main card so template/color choices stay in sync |
+| `:root` variables, base/body/header, template-picker swatches, in-app escape banner | 16–344 | Color palette (maroon/gold on cream), spacing/radius/shadow tokens, the two Google Fonts, the two-column `.layout` grid, header, form panel/fieldset/input/button styling, status banner, character-count and "don't show" checkbox styling, and `#inAppEscapeBanner`'s sticky-top styling |
+| Preview card + `.kv`/`.kv-item` grid | 345–449 | `#card`'s layout, including `container-type: inline-size` so the field grid can respond to the card's own rendered width (not the viewport) via `@container`, and the `.kv-wide` class that forces a field onto its own row |
+| The 4 templates | 450–518 | `tpl-classic`/`tpl-modern`/`tpl-elegant`/`tpl-royal` are CSS custom-property overrides on `#card`/`#igCard` (`--c-bg`, `--c-heading`, `--c-accent`, etc.), not separate markup |
+| `#igCard` | 519–581 | Fixed 1080×1350px off-screen (`left:-9999px`) card used only as an `html2canvas` capture source for the Instagram export; reuses the same CSS variables as the main card so template/color choices stay in sync |
 
-### `<body>` (lines 560–1014)
+### `<body>` (lines 584–1043)
 
 | Section | Lines (approx.) | Purpose |
 |---|---|---|
-| Header | 562–571 | App title (i18n-driven) and the compact English/Telugu `<select>` |
-| `#bioForm` — Personal Details | 580–729 | Required core fields (name, gender, DOB, height, marital status, religion, community, diet, location) plus optional ones (mother tongue, category, complexion) |
-| `#bioForm` — Astro Details | 730–760 | Gothra, maternal uncle's gotram, manglik, rashi, nakshatra — all optional |
-| `#bioForm` — Education & Career | 761–823 | Qualification, college, work sector, occupation, company, annual income (see the expanded income bracket list in the `<select>`) |
-| `#bioForm` — Family Details | 824–853 | Parents' names/occupations, siblings |
-| `#bioForm` — Contact Information | 854–934 | Phone numbers (own/father's/mother's, each a country-code `<select>` + number `<input>` combined into one hidden field), email, address |
-| `#bioForm` — Photo Upload, About Me, Requirements | 935–971 | Photo dropzone; About Me and Partner Requirements textareas, each with a live character counter (300-char limit) and a "don't show in biodata" checkbox for Requirements |
-| Template picker + `#card` preview | 972–1004 | The 4 template swatches and the live preview card (`#photoBox`, `#nameLine`, `#previewBody`) |
-| `#igCard` markup | 1005–1014 | The off-screen Instagram card's DOM, populated by `renderIgCard()` on demand |
+| `#inAppEscapeBanner` markup | 586–589 | Empty by default (`updateInAppEscapeBanner()` fills it in and shows it via JS); holds a text span and an "Open in Chrome" link |
+| Header | 591–600 | App title (i18n-driven) and the compact English/Telugu `<select>` |
+| `#bioForm` — Personal Details | 609–758 | Required core fields (name, gender, DOB, height, marital status, religion, community, diet, location) plus optional ones (mother tongue, category, complexion) |
+| `#bioForm` — Astro Details | 759–789 | Gothra, maternal uncle's gotram, manglik, rashi, nakshatra — all optional |
+| `#bioForm` — Education & Career | 790–852 | Qualification, college, work sector, occupation, company, annual income (see the expanded income bracket list in the `<select>`) |
+| `#bioForm` — Family Details | 853–882 | Parents' names/occupations, siblings |
+| `#bioForm` — Contact Information | 883–963 | Phone numbers (own/father's/mother's, each a country-code `<select>` + number `<input>` combined into one hidden field), email, address |
+| `#bioForm` — Photo Upload, About Me, Requirements | 964–1000 | Photo dropzone; About Me and Partner Requirements textareas, each with a live character counter (300-char limit) and a "don't show in biodata" checkbox for Requirements |
+| Template picker + `#card` preview | 1001–1033 | The 4 template swatches and the live preview card (`#photoBox`, `#nameLine`, `#previewBody`) |
+| `#igCard` markup | 1034–1043 | The off-screen Instagram card's DOM, populated by `renderIgCard()` on demand |
 
-### `<script>` (lines 1015–1795)
+### `<script>` (lines 1044–1878)
 
 | Function / section | Lines (approx.) | Purpose |
 |---|---|---|
-| `SUPABASE_URL`/`SUPABASE_ANON_KEY` + client init | 1020–1027 | Hardcoded project config; `supabaseClient` stays `null` if the URL/key look unset, which disables persistence but not the downloads |
-| `FIELDS` | 1028–1042 | Canonical list of form field IDs that map 1:1 to `biodata_submissions` columns — used when building the record to insert |
-| `isFieldHidden()`, `HIDEABLE_FIELDS` injection | 1043–1059 | The generic "don't show in biodata" mechanism: any field can be hidden via a checkbox named `hide_<fieldId>`. Phone numbers and Requirements have theirs hand-written in the HTML; `HIDEABLE_FIELDS` lists the rest (most Personal/Astro/Family fields) and injects an identical checkbox right after each one at page load, rather than repeating the markup by hand |
-| `I18N` (`en`/`te`) | 1069–1257 | All UI strings, field labels, placeholders, dropdown option labels, and JS-generated status messages for both languages, keyed identically per language |
-| `t()`, `label()`, `displayValue()` | 1261–1278 | i18n lookup helpers. `displayValue()` is the important one: select fields store a canonical English value in the DOM, and this maps it to the current language's display text only for rendering — so a record saved while viewing Telugu still has English enum values |
-| `applyOptionTranslations()`, `applyStaticTranslations()`, `applyLanguage()` | 1279–1328 | Re-render all translatable UI (labels, placeholders, `<option>` text, preview) when the language changes; persists the choice to `localStorage` |
-| `syncCardA4MinHeight()` | 1329–1335 | Sets `#card`'s `min-height` from its current rendered width (`width * 297/210`) so the preview always looks at least like an A4 page, via a `ResizeObserver` — a floor, not a fixed height, so longer content still grows the card instead of being clipped |
-| `setTemplate()` | 1336–1357 | Swaps the `tpl-*` class on both `#card` and `#igCard`, updates the subtitle text, and persists the choice to `localStorage` |
-| `fmtDate()` | 1358–1364 | Formats the `dob` input's ISO value for display (`14 Aug 1996`) |
-| Photo upload handling | 1365–1387 | Validates file type (JPG/PNG only via `ALLOWED_PHOTO_TYPES`), reads it as a data URL for the live preview (`photoDataUrl`) |
-| `wireCharCount()` | 1390–1406 | Wires a textarea + its counter `<span>` so About Me / Requirements show a live `x/300` count and flag when the limit is reached |
-| `wirePhoneField()` | 1407–1420 | Combines a country-code `<select>` and a number `<input>` into one hidden field (`phone`/`father_phone`/`mother_phone`), used by the record and both card renderers |
-| `renderPreview()` | 1421–1481 | Rebuilds `#previewBody`'s HTML from current form values: groups fields per section with a `pairMode` (dynamic/fixed/single) controlling row-sharing, skips anything `isFieldHidden()`, and appends the Requirements section |
-| `escapeHtml()` | 1483–1488 | HTML-escapes a string for safe interpolation into `innerHTML` |
-| `showStatus()` | 1494–1498 | Sets the `#status` banner's text and ok/err/warn styling |
-| `isInAppBrowser()` + load-time check | 1500–1513 | Sniffs `navigator.userAgent` for known in-app WebViews (Instagram, Facebook, TikTok, Line, WeChat) and, if matched, immediately shows a warning status — these WebViews are known to silently block downloads no matter how the file is triggered, so there's no code fix, only a heads-up |
-| `compressImage()` | 1517–1534 | Client-side resize (max 800px) + re-encode to JPEG (quality 0.8) before any photo is uploaded, to limit Supabase storage usage |
-| `uploadPhoto()`, `uploadCardImage()` | 1535–1556 | Upload the compressed photo / rendered card canvas to the `biodata-photos` / `biodata-cards` Supabase Storage buckets and return their public URLs |
-| `fileNameBase()` | 1557–1562 | Derives the downloaded file's name from the entered first/last name |
-| `renderCardCanvas()` | 1563–1572 | `html2canvas`-based capture of `#card`, reused by every generator below |
-| `triggerDownload()` | 1574–1593 | Shared save mechanism for all three exports: builds a `Blob`/`URL.createObjectURL()`, clicks a temporarily-attached `<a download>`, then revokes the object URL after a delay. Replaced an earlier `data:` URI + detached-anchor approach that Instagram's in-app browser silently refused to save |
-| `generatePdf()`, `generateImage()` | 1595–1623 | Fit-to-A4-page PDF export (`jsPDF`, output as a blob) or direct PNG — both hand off to `triggerDownload()` |
-| `saveToDbIfNeeded()` | 1625–1649 | Builds the record from `FIELDS`, uploads photo/card image if applicable, inserts into `biodata_submissions`; no-ops if already saved this session or no Supabase client is configured. Called from `handleDownload` inside a try/catch that only logs failures |
-| `validate()`, `handleDownload()` | 1651–1704 | Shared flow for the PDF/Image buttons: validate → render canvas once → save-if-needed (silently) → run the specific generator → show one generic downloaded/download-failed status |
-| `calcAge()`, `val()`, `renderIgCard()`, `generateInstagramImage()` | 1706–1773 | Instagram-specific: computes age from DOB, builds the tagline/detail lines (education, occupation, income, location, religion/caste), and captures `#igCard` at a fixed 1080×1350 size, also handing off to `triggerDownload()` |
-| `igBtn` click handler + initial `applyLanguage(currentLang)` | 1775–1795 | Same validate → canvas → generate → status flow as `handleDownload`, specialized for the Instagram image (no database save); the final line performs the initial render on page load |
+| `SUPABASE_URL`/`SUPABASE_ANON_KEY` + client init | 1049–1056 | Hardcoded project config; `supabaseClient` stays `null` if the URL/key look unset, which disables persistence but not the downloads |
+| `FIELDS` | 1057–1071 | Canonical list of form field IDs that map 1:1 to `biodata_submissions` columns — used when building the record to insert |
+| `isFieldHidden()`, `HIDEABLE_FIELDS` injection | 1072–1097 | The generic "don't show in biodata" mechanism: any field can be hidden via a checkbox named `hide_<fieldId>`. Phone numbers and Requirements have theirs hand-written in the HTML; `HIDEABLE_FIELDS` lists the rest (most Personal/Astro/Family fields) and injects an identical checkbox right after each one at page load, rather than repeating the markup by hand |
+| `I18N` (`en`/`te`) | 1098–1290 | All UI strings, field labels, placeholders, dropdown option labels, and JS-generated status messages for both languages, keyed identically per language — including `btn.openInChrome` and `msg.inAppEscapeAndroid`/`inAppEscapeOther` |
+| `t()`, `label()`, `displayValue()` | 1294–1311 | i18n lookup helpers. `displayValue()` is the important one: select fields store a canonical English value in the DOM, and this maps it to the current language's display text only for rendering — so a record saved while viewing Telugu still has English enum values |
+| `applyOptionTranslations()`, `applyStaticTranslations()`, `applyLanguage()` | 1312–1362 | Re-render all translatable UI (labels, placeholders, `<option>` text, preview) when the language changes; persists the choice to `localStorage`; also re-runs `updateInAppEscapeBanner()` so its text follows the current language |
+| `syncCardA4MinHeight()` | 1363–1371 | Sets `#card`'s `min-height` from its current rendered width (`width * 297/210`) so the preview always looks at least like an A4 page, via a `ResizeObserver` — a floor, not a fixed height, so longer content still grows the card instead of being clipped |
+| `setTemplate()` | 1372–1391 | Swaps the `tpl-*` class on both `#card` and `#igCard`, updates the subtitle text, and persists the choice to `localStorage` |
+| `fmtDate()` | 1392–1400 | Formats the `dob` input's ISO value for display (`14 Aug 1996`) |
+| Photo upload handling | 1401–1423 | Validates file type (JPG/PNG only via `ALLOWED_PHOTO_TYPES`), reads it as a data URL for the live preview (`photoDataUrl`) |
+| `wireCharCount()` | 1424–1440 | Wires a textarea + its counter `<span>` so About Me / Requirements show a live `x/300` count and flag when the limit is reached |
+| `wirePhoneField()` | 1441–1454 | Combines a country-code `<select>` and a number `<input>` into one hidden field (`phone`/`father_phone`/`mother_phone`), used by the record and both card renderers |
+| `renderPreview()` | 1455–1516 | Rebuilds `#previewBody`'s HTML from current form values: groups fields per section with a `pairMode` (dynamic/fixed/single) controlling row-sharing, skips anything `isFieldHidden()`, and appends the Requirements section |
+| `escapeHtml()` | 1517–1525 | HTML-escapes a string for safe interpolation into `innerHTML` |
+| `showStatus()` | 1526–1537 | Sets the `#status` banner's text and ok/err/warn styling |
+| `isInAppBrowser()` | 1538–1549 | Sniffs `navigator.userAgent` for known in-app WebViews (Instagram, Facebook, TikTok, Line, WeChat) |
+| `isAndroidInAppBrowser()`, `buildChromeIntentUrl()`, `updateInAppEscapeBanner()` + load-time call | 1550–1582 | Drives `#inAppEscapeBanner`: on a detected in-app browser, shows it immediately (before any download is attempted) with an Android-only `intent:` link that hands navigation straight to Chrome (`S.browser_fallback_url` covers Chrome-not-installed), or plain "open in Safari" instructions everywhere else — there's no equivalent redirect trick on iOS |
+| `compressImage()` | 1583–1600 | Client-side resize (max 800px) + re-encode to JPEG (quality 0.8) before any photo is uploaded, to limit Supabase storage usage |
+| `uploadPhoto()`, `uploadCardImage()` | 1601–1622 | Upload the compressed photo / rendered card canvas to the `biodata-photos` / `biodata-cards` Supabase Storage buckets and return their public URLs |
+| `fileNameBase()` | 1623–1628 | Derives the downloaded file's name from the entered first/last name |
+| `renderCardCanvas()` | 1629–1652 | `html2canvas`-based capture of `#card`, reused by every generator below |
+| `triggerDownload()` | 1653–1677 | Shared save mechanism for all three exports. Inside a detected in-app browser, tries `navigator.share({files:[file]})` first (opens the OS share sheet — "Save Image"/"Save to Files" — which some in-app WebViews honor even with no download manager of their own); otherwise, or if sharing fails for any reason other than the user cancelling, falls back to a `Blob`/`URL.createObjectURL()` clicked via a temporarily-attached `<a download>` (replaced an earlier `data:` URI + detached-anchor approach that Instagram's in-app browser silently refused to save) |
+| `generatePdf()`, `generateImage()` | 1678–1707 | Fit-to-A4-page PDF export (`jsPDF`, output as a blob) or direct PNG — both `await` `triggerDownload()` |
+| `saveToDbIfNeeded()` | 1708–1733 | Builds the record from `FIELDS`, uploads photo/card image if applicable, inserts into `biodata_submissions`; no-ops if already saved this session or no Supabase client is configured. Called from `handleDownload` inside a try/catch that only logs failures |
+| `validate()`, `handleDownload()` | 1734–1788 | Shared flow for the PDF/Image buttons: validate → render canvas once → save-if-needed (silently) → run the specific generator → show one generic downloaded/download-failed status |
+| `calcAge()`, `val()`, `renderIgCard()`, `generateInstagramImage()` | 1789–1857 | Instagram-specific: computes age from DOB, builds the tagline/detail lines (education, occupation, income, location, religion/caste), and captures `#igCard` at a fixed 1080×1350 size, also `await`-ing `triggerDownload()` |
+| `igBtn` click handler + initial `applyLanguage(currentLang)` | 1858–1878 | Same validate → canvas → generate → status flow as `handleDownload`, specialized for the Instagram image (no database save); the final line performs the initial render on page load |
 
 ## Key design decisions / gotchas
 
@@ -126,4 +132,5 @@ Since the whole app is one file, this table breaks it down by logical section (i
 - **The Supabase anon key is meant to be public.** It's restricted entirely by the row-level security policies in `supabase_setup.sql` (insert-only, no `SELECT`/`UPDATE`/`DELETE` for the `anon` role) — this is the standard Supabase pattern for a public-facing form, not a leaked secret. Viewing submitted data requires logging into the Supabase dashboard directly.
 - **Storage buckets intentionally have no `SELECT` policy.** The buckets are public, so a known file's direct public URL is already fetchable without RLS; adding a broad `SELECT` policy would instead let anyone *list* every file in the bucket via the Storage API (a warning Supabase's dashboard flags explicitly) — the SQL comments call this out.
 - **`saveToDbIfNeeded` runs at most once per page load** (`savedToDb` flag), so downloading PDF, then Image, then Instagram for the same filled-in form doesn't create duplicate submissions.
-- **Downloads go through `triggerDownload()`'s Blob + attached-anchor pattern, not a bare `data:` URI.** Instagram/Facebook/TikTok's in-app WebViews are known to silently refuse to save a `data:` URI clicked via a detached `<a>` — the file generates fine but nothing ever reaches the device. A real `Blob` object URL clicked via an anchor that's briefly attached to the DOM is compatible with a much wider range of these WebViews. `isInAppBrowser()` additionally warns the user up front when one is detected, since some WebView versions block downloads outright no matter the technique — that part has no code-side fix, only a "open this in Chrome/Safari" nudge.
+- **Downloads go through `triggerDownload()`'s Web Share → Blob/attached-anchor fallback chain, not a bare `data:` URI.** The `data:` URI + detached-`<a>` approach this used to use is silently refused by Instagram/Facebook/TikTok's in-app WebViews; a `Blob` object URL clicked via an anchor briefly attached to the DOM, or (in a detected in-app browser) handing the file to `navigator.share()` for the OS's native share sheet, are both more compatible attempts. None of this is guaranteed, though — confirmed on a real device, Instagram's Android in-app browser blocks *both* of these too, because that WebView has no download manager and no share-sheet path out at all in that build. There is no client-side technique that reliably forces a file out of a WebView that's designed not to allow it.
+- **The real fix for in-app browsers is escaping them, not out-downloading them.** `updateInAppEscapeBanner()` (driven by `isInAppBrowser()`/`isAndroidInAppBrowser()`) shows a sticky banner at the top of the page *before* the user even tries to download, not just after a failed attempt. On Android it's a real "Open in Chrome" button using an `intent:` URL (`buildChromeIntentUrl()`) — a native OS scheme that hands navigation to Android's intent resolver, bypassing the in-app WebView outright, with a `browser_fallback_url` so it never dead-ends without Chrome installed. This is confirmed working end-to-end (Instagram → banner → Chrome → download) on a real Android device. iOS has no equivalent: Apple doesn't let a webpage force-launch Safari from inside another app's in-app browser, so iOS (and any other non-Android in-app browser) only gets text instructions to open the page in Safari manually — unverified on a real device, since testing that requires an iPhone.
